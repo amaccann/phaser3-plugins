@@ -9,6 +9,9 @@ const config = require('./config');
 module.exports = {
   mode: 'development',
   devtool: 'eval-source-map',
+  entry: {
+    entry: `${config.DEMO}/index.js`
+  },
   resolve: {
     alias: {
       src: config.SRC,
@@ -41,7 +44,7 @@ module.exports = {
       WEBGL_RENDERER: JSON.stringify(true),
     }),
     new HtmlWebpackPlugin({
-      template: `${config.SRC}/index.html`,
+      template: `${config.DEMO}/index.html`,
     }),
     new CopyPlugin([{ from: config.ASSETS, to: config.ASSETS_FOLDER_NAME }]),
   ],
