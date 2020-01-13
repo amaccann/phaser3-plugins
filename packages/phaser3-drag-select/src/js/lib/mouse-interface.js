@@ -1,4 +1,5 @@
 import { EVENT_MAP } from './constants';
+import PluginConfig from './plugin-config';
 
 export default class MouseInterface extends Phaser.GameObjects.Graphics {
   isDisabled = false;
@@ -67,7 +68,14 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
       return;
     }
 
-    this.fillStyle(0xff00ff, 0.5);
+    const color = PluginConfig.get('rectBgColor');
+    const alpha = PluginConfig.get('rectAlpha');
+    const lineWidth = PluginConfig.get('outlineWidth');
+    const lineColor = PluginConfig.get('outlineColor');
+
+    this.lineStyle(lineWidth, lineColor, 1);
+    this.fillStyle(color, alpha);
     this.fillRect(start.x, start.y, end.x - start.x, end.y - start.y);
+    this.strokeRect(start.x, start.y, end.x - start.x, end.y - start.y);
   }
 }

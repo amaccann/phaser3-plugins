@@ -5,6 +5,7 @@ import DragSelectPlugin from 'src/js/drag-select-plugin';
 const { KeyCodes } = Phaser.Input.Keyboard;
 
 export default class DemoScene extends Scene {
+  dragSelect;
   fpsText;
   myControls;
   mySprite;
@@ -38,13 +39,26 @@ export default class DemoScene extends Scene {
     this.add.existing(this.mySprite);
   }
 
+  onSelect = sprites => {
+    console.warn('sprites', sprites);
+  };
+
   preload() {
-    this.load.scenePlugin('dragSelect', DragSelectPlugin);
+    this.load.scenePlugin('DragSelectPlugin', DragSelectPlugin, 'dragSelect', 'dragSelect');
 
     this.load.image('temp', 'src/assets/temp-crowd-50x50.png');
   }
 
   create() {
+    console.log('dragSelect', this.dragSelect);
+    this.dragSelect.init({
+      onSelect: this.onSelect,
+      outlineColor: 0x00ff00,
+      outlineWidth: 2,
+      rectBgColor: 0x33ff00,
+      rectAlpha: 0.2,
+    });
+
     this.fpsText = this.add.text(10, 10, '');
     this.fpsText.setScrollFactor(0);
 
