@@ -2,8 +2,10 @@ import Phaser from 'phaser';
 
 import InterfaceScene from './lib/interface-scene';
 import { EVENT_MAP } from './lib/constants';
+import PluginConfig from './lib/plugin-config';
 
 export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
+  config;
   interfaceScene;
 
   enabled = true;
@@ -22,10 +24,17 @@ export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
     return this.pluginManager.scene;
   }
 
+  init(config = {}) {
+    PluginConfig.setConfig(config);
+
+    this.createInterfaceScene();
+    this.addEmitterEventCallbacks();
+  }
+
   createInterfaceScene() {
     const scenePlugin = this.scenePlugin;
 
-    this.interfaceScene = new InterfaceScene(scenePlugin);
+    this.interfaceScene = new InterfaceScene(scenePlugin, this.config);
   }
 
   addEmitterEventCallbacks() {
@@ -79,13 +88,14 @@ export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
     }, []);
     console.log('activeScenes', activeScenes);
     console.log('items', items);
+    PluginConfig.get('onSelect')(items);
   };
 
   //  Called when the Plugin is booted by the PluginManager.
   //  If you need to reference other systems in the Scene (like the Loader or DisplayList) then set-up those references now, not in the constructor.
   boot() {
-    this.createInterfaceScene();
-    this.addEmitterEventCallbacks();
+    // this.createInterfaceScene();
+    // this.addEmitterEventCallbacks();
   }
 
   //  Called every Scene step - phase 1
