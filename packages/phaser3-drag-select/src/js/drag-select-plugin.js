@@ -1,32 +1,45 @@
-export default class DragSelectPlugin extends Phaser.Plugins.ScenePlugin {
+import Phaser from 'phaser';
+
+import MouseInterface from './lib/mouse-interface';
+import InterfaceScene from './lib/interface-scene';
+import { EVENT_MAP } from './lib/constants';
+
+let tempMatrix = new Phaser.GameObjects.Components.TransformMatrix();
+let tempParentMatrix = new Phaser.GameObjects.Components.TransformMatrix();
+
+export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
+  interfaceScene;
+
   enabled = true;
 
-  constructor(scene, pluginManager) {
-    super(scene, pluginManager);
-    this.scene = scene;
+  constructor(pluginManager) {
+    // console.log('constructor', scene);
+    console.log('pluginManager', pluginManager);
+    super(pluginManager);
     this.counter = 0;
     this.countDelay = 300;
     this.nextCount = 0;
     this.textObject = null;
     this.active = true;
+
+    // console.log('targetScene', scene);
+    console.log('this', this);
   }
 
-  //  Called when the Plugin is booted by the PluginManager.
-  //  If you need to reference other systems in the Scene (like the Loader or DisplayList) then set-up those references now, not in the constructor.
-  boot() {
-    let eventEmitter = this.systems.events;
-    console.log('eventEmitter', eventEmitter);
+  get scenePlugin() {
+    return this.pluginManager.scene;
+  }
+
+  createInterfaceScene() {
+    const scenePlugin = this.scenePlugin;
+
+    this.interfaceScene = new InterfaceScene(scenePlugin);
+  }
+
+  addEmitterEventCallbacks() {
+    const eventEmitter = this.pluginManager.sys.events;
 
     eventEmitter.on('update', this.update, this);
-    this.text = this.scene.add.text(100, 200, 'Phaser', {
-      fontFamily: 'Arial',
-      fontSize: 64,
-      color: '#00ff00'
-    });
-
-    /*
-        List of unused eventEmitters to activate matching methods of this plugin
-    */
 
     eventEmitter.on('start', this.start, this);
 
@@ -41,11 +54,47 @@ export default class DragSelectPlugin extends Phaser.Plugins.ScenePlugin {
 
     eventEmitter.on('shutdown', this.shutdown, this);
     eventEmitter.on('destroy', this.destroy, this);
+
+    this.interfaceScene.sys.events.on(EVENT_MAP.ON_MOUSE_UP, this.onMouseUp);
   }
 
-  //  Called when a Scene is started by the SceneManager. The Scene is now active, visible and running.
-  start() {
-    console.warn('Plugin started!!');
+  onMouseUp = (rectangle) => {
+    console.group('onMouseUp');
+    const { manager } = this.scenePlugin;
+    console.log('rectangle', rectangle);
+
+    console.log('sceneManager', manager);
+    const activeScenes = manager.getScenes();
+    const items = activeScenes.reduce((list, scene) => {
+      console.warn('scene', scene);
+      return list.concat(scene.children.getChildren().filter(child => {
+        if (!child.input?.enabled) {
+          return;
+        }
+        child.getWorldTransformMatrix(tempMatrix, tempParentMatrix);
+        const d = tempMatrix.decomposeMatrix();
+        console.log('d', d);
+        console.log('child', child);
+        console.log('getBounds', child.input?.enabled && child.getBounds());
+        return Phaser.Geom.Rectangle.Overlaps(rectangle, child.getBounds());
+      }));
+    }, []);
+    console.log('activeScenes', activeScenes);
+    console.log('items', items);
+    console.groupEnd();
+  };
+
+  //  Called when the Plugin is booted by the PluginManager.
+  //  If you need to reference other systems in the Scene (like the Loader or DisplayList) then set-up those references now, not in the constructor.
+  boot() {
+    this.createInterfaceScene();
+    this.addEmitterEventCallbacks();
+
+    this.text = this.interfaceScene.add.text(100, 200, 'Phaser', {
+      fontFamily: 'Arial',
+      fontSize: 64,
+      color: '#00ff00'
+    });
   }
 
   //  Called every Scene step - phase 1
@@ -70,11 +119,13 @@ export default class DragSelectPlugin extends Phaser.Plugins.ScenePlugin {
 
   //  Called when a Scene is paused. A paused scene doesn't have its Step run, but still renders.
   pause() {
+    console.log('pause');
     this.enabled = false;
   }
 
   //  Called when a Scene is resumed from a paused state.
   resume() {
+    console.log('resume');
     this.enabled = true;
   }
 
@@ -95,7 +146,8 @@ export default class DragSelectPlugin extends Phaser.Plugins.ScenePlugin {
   //  Called when a Scene is destroyed by the Scene Manager. There is no coming back from a destroyed Scene, so clear up all resources here.
   destroy() {
     this.shutdown();
-    this.scene = undefined;
+    this.interfaceScene.destroy();
+    this.interfaceScene = undefined;
   }
 
   //  Custom method for this plugin
