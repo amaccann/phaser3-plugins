@@ -1,11 +1,7 @@
 import Phaser from 'phaser';
 
-import MouseInterface from './lib/mouse-interface';
 import InterfaceScene from './lib/interface-scene';
 import { EVENT_MAP } from './lib/constants';
-
-let tempMatrix = new Phaser.GameObjects.Components.TransformMatrix();
-let tempParentMatrix = new Phaser.GameObjects.Components.TransformMatrix();
 
 export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
   interfaceScene;
@@ -16,10 +12,6 @@ export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
     // console.log('constructor', scene);
     console.log('pluginManager', pluginManager);
     super(pluginManager);
-    this.counter = 0;
-    this.countDelay = 300;
-    this.nextCount = 0;
-    this.textObject = null;
     this.active = true;
 
     // console.log('targetScene', scene);
@@ -58,30 +50,35 @@ export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
     this.interfaceScene.sys.events.on(EVENT_MAP.ON_MOUSE_UP, this.onMouseUp);
   }
 
-  onMouseUp = (rectangle) => {
-    console.group('onMouseUp');
+  onMouseUp = rectangle => {
     const { manager } = this.scenePlugin;
-    console.log('rectangle', rectangle);
-
-    console.log('sceneManager', manager);
     const activeScenes = manager.getScenes();
+
     const items = activeScenes.reduce((list, scene) => {
-      console.warn('scene', scene);
-      return list.concat(scene.children.getChildren().filter(child => {
-        if (!child.input?.enabled) {
-          return;
-        }
-        child.getWorldTransformMatrix(tempMatrix, tempParentMatrix);
-        const d = tempMatrix.decomposeMatrix();
-        console.log('d', d);
-        console.log('child', child);
-        console.log('getBounds', child.input?.enabled && child.getBounds());
-        return Phaser.Geom.Rectangle.Overlaps(rectangle, child.getBounds());
-      }));
+      if (scene === this.interfaceScene) {
+        return list;
+      }
+
+      return list.concat(
+        scene.children.getChildren().filter(child => {
+          if (!child.input?.enabled || !child.getBounds) {
+            return;
+          }
+
+          const camera = scene.cameras.main;
+          const childBounds = child.getBounds();
+          const x = (childBounds.x - camera.worldView.x) * camera.zoom;
+          const y = (childBounds.y - camera.worldView.y) * camera.zoom;
+          const width = childBounds.width * camera.zoom;
+          const height = childBounds.height * camera.zoom;
+          const childRect = new Phaser.Geom.Rectangle(x, y, width, height);
+
+          return Phaser.Geom.Rectangle.Overlaps(rectangle, childRect);
+        })
+      );
     }, []);
     console.log('activeScenes', activeScenes);
     console.log('items', items);
-    console.groupEnd();
   };
 
   //  Called when the Plugin is booted by the PluginManager.
@@ -89,28 +86,15 @@ export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
   boot() {
     this.createInterfaceScene();
     this.addEmitterEventCallbacks();
-
-    this.text = this.interfaceScene.add.text(100, 200, 'Phaser', {
-      fontFamily: 'Arial',
-      fontSize: 64,
-      color: '#00ff00'
-    });
   }
 
   //  Called every Scene step - phase 1
-  preUpdate = (time, delta) => {}
+  preUpdate = (time, delta) => {};
 
   //  Called every Scene step - phase 2
   update(time, delta) {
     if (!this.active) {
       return;
-    }
-    if ((this.nextCount -= delta) < 0) {
-      if (++this.counter > 99) {
-        this.counter = 0;
-      }
-      this.text.setText(this.counter);
-      this.nextCount = this.countDelay;
     }
   }
 
@@ -151,13 +135,8 @@ export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
   }
 
   //  Custom method for this plugin
-  setDelay(delay) {
-    this.countDelay = delay;
-  }
+  setDelay(delay) {}
 
   //  Custom method for this plugin
-  reset() {
-    this.counter = 0;
-    this.text.setText(0);
-  }
+  reset() {}
 }
