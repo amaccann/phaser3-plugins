@@ -17,7 +17,10 @@ export const MOUSE_BUTTONS = {
 
 const MOUSE_BUTTONS_VALUES = Object.values(MOUSE_BUTTONS);
 
+export const IS_INTERACTIVE_CHILD = child => child.input?.enabled;
+
 export const PLUGIN_DEFAULT_CONFIG = {
+  childSelector: IS_INTERACTIVE_CHILD,
   mouseClickToTrack: MOUSE_BUTTONS.LEFT,
   outlineColor: 0x00ff00,
   outlineWidth: 2,

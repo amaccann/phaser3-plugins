@@ -88,6 +88,7 @@ export default class DemoScene extends Scene {
   create() {
     console.log('dragSelect', this.dragSelect);
     this.dragSelect.init({
+      // childSelector: () => true, // select everything! :-)
       onSelect: this.onSelect,
       outlineColor: 0x00ff00,
       outlineWidth: 2,
