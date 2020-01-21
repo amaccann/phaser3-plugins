@@ -1,8 +1,11 @@
 import Phaser, { Scene } from 'phaser';
 
 import DragSelectPlugin from 'src/js/drag-select-plugin';
+import { forEach } from 'src/js/util';
 
 const { KeyCodes } = Phaser.Input.Keyboard;
+
+const ROTATE_BY = 0.025;
 
 export default class DemoScene extends Scene {
   dragSelect;
@@ -33,10 +36,31 @@ export default class DemoScene extends Scene {
     this.myControls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
   }
 
-  createSprite() {
-    this.mySprite = new Phaser.GameObjects.Sprite(this, 100, 100, 'temp');
-    this.mySprite.setInteractive();
-    this.add.existing(this.mySprite);
+  createSprites() {
+    this.mySprites = [];
+    let x = 1;
+    const length = 5;
+    let sprite;
+    let setAsInteractive;
+    let spriteKey;
+    let y;
+
+    for (x; x <= length; x+=1) {
+      y = 1;
+      for (y; y <= length; y+=1) {
+        // Every even numbered item will be set as "interactive"
+        setAsInteractive = x % 2 === 0;
+        spriteKey = setAsInteractive ? 'enabled-sprite' : 'disabled-sprite';
+        sprite = new Phaser.GameObjects.Sprite(this, x * 100, y * 100, spriteKey);
+
+        if (setAsInteractive) {
+          sprite.setInteractive();
+        }
+
+        this.add.existing(sprite);
+        this.mySprites.push(sprite);
+      }
+    }
   }
 
   onSelect = sprites => {
@@ -47,12 +71,18 @@ export default class DemoScene extends Scene {
     });
 
     sprites.forEach(sprite => sprite.setTint(0xff00ff));
+    this.setSelectedSpritesText(sprites);
   };
+
+  setSelectedSpritesText(sprites = []) {
+    this.selectedSpritesText.setText(`${sprites.length} sprites selected`);
+  }
 
   preload() {
     this.load.scenePlugin('DragSelectPlugin', DragSelectPlugin, 'dragSelect', 'dragSelect');
 
-    this.load.image('temp', 'src/assets/temp-crowd-50x50.png');
+    this.load.image('disabled-sprite', 'src/assets/disabled-sprite-50x50.png');
+    this.load.image('enabled-sprite', 'src/assets/enabled-sprite-50x50.png');
   }
 
   create() {
@@ -68,14 +98,20 @@ export default class DemoScene extends Scene {
     this.fpsText = this.add.text(10, 10, '');
     this.fpsText.setScrollFactor(0);
 
+    this.selectedSpritesText = this.add.text(200, 10, '');
+    this.selectedSpritesText.setScrollFactor(0);
+    this.setSelectedSpritesText();
+
     this.createCamera();
-    this.createSprite();
+    this.createSprites();
   }
 
   update(time, delta) {
     this.myControls.update(time, delta);
-    this.mySprite.rotation += 0.05;
+    forEach(this.mySprites, sprite => {
+      sprite.rotation += ROTATE_BY;
+    });
 
-    this.fpsText.setText(`FPS: ${this.game.loop.actualFps}`);
+    this.fpsText.setText(`FPS: ${this.game.loop.actualFps.toFixed(3)}`);
   }
 }
