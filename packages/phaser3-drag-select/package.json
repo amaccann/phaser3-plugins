@@ -12,6 +12,9 @@
     "lint": "prettier --write ./src/**/*.js",
     "start": "webpack-dev-server --config webpack/base.js --open"
   },
+  "engines": {
+    "node": ">=10"
+  },
   "husky": {
     "hooks": {
       "pre-commit": "pretty-quick --staged"
@@ -30,8 +33,9 @@
     "copy-webpack-plugin": "^5.1.1",
     "file-loader": "^5.0.2",
     "html-webpack-plugin": "^3.2.0",
-    "husky": "^4.0.7",
-    "prettier": "^1.19.1",
+    "husky": "^4.0.10",
+    "lint-staged": "^10.0.1",
+    "prettier": "1.19.1",
     "pretty-quick": "^2.0.1",
     "raw-loader": "^4.0.0",
     "terser-webpack-plugin": "^2.3.2",

@@ -88,7 +88,9 @@ export default class DemoScene extends Scene {
   create() {
     console.log('dragSelect', this.dragSelect);
     this.dragSelect.init({
+      camera: this.cameras.main,
       // childSelector: () => true, // select everything! :-)
+      // dragCameraBy: false, // disable drag camera
       onSelect: this.onSelect,
       outlineColor: 0x00ff00,
       outlineWidth: 2,

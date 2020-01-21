@@ -1,5 +1,5 @@
 import { EVENT_MAP } from './constants';
-import PluginConfig from './plugin-config';
+import PluginConfig, { MOUSE_BUTTONS } from './plugin-config';
 
 const PREVENT_DEFAULT = e => e.preventDefault();
 
@@ -7,6 +7,7 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
   isDisabled = false;
   isDragging = false;
   isMouseDown = false;
+  isCameraDragDown = false;
 
   start = new Phaser.Math.Vector2();
   end = new Phaser.Math.Vector2();
@@ -16,12 +17,33 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
 
     scene.add.existing(this);
     this.initialiseInputEvents();
+    this.initialiseCameraDrag();
+  }
+
+  get isRightClickDisabled() {
+    return !!this.scene.game.canvas.oncontextmenu;
   }
 
   getIsValidClickToTrack = button => {
     const mouseClickToTrack = PluginConfig.get('mouseClickToTrack');
-    return button === mouseClickToTrack
+    return button === mouseClickToTrack;
   };
+
+  initialiseCameraDrag() {
+    const { scene } = this;
+    const isContextMenuEnabled = !this.isRightClickDisabled;
+    const dragCameraBy = PluginConfig.get('dragCameraBy');
+    const isRightClickToDrag = dragCameraBy === MOUSE_BUTTONS.RIGHT;
+
+    // If the context menu is enabled && we set drag camera to "Right" click, ignore
+    if (!dragCameraBy || (isRightClickToDrag && isContextMenuEnabled)) {
+      return;
+    }
+
+    scene.input.on('pointerdown', this.onCameraDragPointerDown);
+    scene.input.on('pointerup', this.onCameraDragPointerUp);
+    scene.input.on('pointermove', this.onCameraDragPointerMove);
+  }
 
   initialiseInputEvents() {
     const { scene } = this;
@@ -31,9 +53,43 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
     scene.input.on('pointerdown', this.onPointerDown);
     scene.input.on('pointerup', this.onPointerUp);
     scene.input.on('pointermove', this.onPointerMove);
+    scene.input.on('gameover', this.onGameOver);
   }
 
-  onPointerDown = (pointer) => {
+  onCameraDragPointerDown = pointer => {
+    this.isCameraDragDown = PluginConfig.get('dragCameraBy') === pointer.buttons;
+  };
+
+  onCameraDragPointerUp = () => {
+    this.isCameraDragDown = false;
+  };
+
+  onCameraDragPointerMove = pointer => {
+    if (!this.isCameraDragDown) {
+      return;
+    }
+
+    const cam = PluginConfig.get('camera');
+
+    // const ACCELERATION = 0.025;
+    // const { x, y } = pointer.velocity;
+    // cam.scrollX -= (x * ACCELERATION) / cam.zoom;
+    // cam.scrollY -= (y * ACCELERATION) / cam.zoom;
+    cam.scrollX -= (pointer.position.x - pointer.prevPosition.x) / cam.zoom;
+    cam.scrollY -= (pointer.position.y - pointer.prevPosition.y) / cam.zoom;
+  };
+
+  onGameOver = (time, event) => {
+    const isClickTypeToTrack = this.getIsValidClickToTrack(event.buttons);
+    if (!isClickTypeToTrack) {
+      this.isCameraDragDown = false;
+      this.isDragging = false;
+      this.isMouseDown = false;
+    }
+    this.end.setTo(event.x, event.y);
+  };
+
+  onPointerDown = pointer => {
     const isClickTypeToTrack = this.getIsValidClickToTrack(pointer.buttons);
 
     if (this.isDisabled || !isClickTypeToTrack) {
@@ -45,11 +101,14 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
     this.isMouseDown = true;
   };
 
-  onPointerUp = () => {
+  onPointerUp = pointer => {
     const { start, end } = this;
 
     this.isDragging = false;
     this.isMouseDown = false;
+    if (this.isCameraDragDown) {
+      return;
+    }
 
     const startX = start.x;
     const startY = start.y;
@@ -80,6 +139,7 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
 
   onPointerMove = pointer => {
     const isClickTypeToTrack = this.getIsValidClickToTrack(pointer.buttons);
+
     if (!this.isMouseDown || !isClickTypeToTrack) {
       return this;
     }
@@ -87,6 +147,20 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
     this.isDragging = true;
     this.end.setTo(pointer.worldX, pointer.worldY);
   };
+
+  destroy(fromScene) {
+    const { scene } = this;
+    super.destroy(fromScene);
+
+    scene.input.off('pointerdown', this.onCameraDragPointerDown);
+    scene.input.off('pointerup', this.onCameraDragPointerUp);
+    scene.input.off('pointermove', this.onCameraDragPointerMove);
+
+    scene.input.off('pointerdown', this.onPointerDown);
+    scene.input.off('pointerup', this.onPointerUp);
+    scene.input.off('pointermove', this.onPointerMove);
+    scene.input.off('gameover', this.onGameOver);
+  }
 
   preUpdate() {
     const { start, end } = this;
