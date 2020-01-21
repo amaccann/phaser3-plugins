@@ -3,7 +3,9 @@
 ### Config settings
 
 ```
+    camera: <MainGameSceneCamera>,
     childSelector: <Function>,
+    dragCameraBy: 2, // right-button 
     mouseClickToTrack: 1, // left-button
     outlineColor: 0x00ff00,
     outlineWidth: 2,
