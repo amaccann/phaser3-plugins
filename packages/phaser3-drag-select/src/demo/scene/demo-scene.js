@@ -41,6 +41,12 @@ export default class DemoScene extends Scene {
 
   onSelect = sprites => {
     console.warn('sprites', sprites);
+
+    this.children.getChildren().forEach(obj => {
+      obj.setTint(0xffffff);
+    });
+
+    sprites.forEach(sprite => sprite.setTint(0xff00ff));
   };
 
   preload() {
