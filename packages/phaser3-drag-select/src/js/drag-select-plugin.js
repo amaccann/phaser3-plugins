@@ -4,6 +4,7 @@ import InterfaceScene from './lib/interface-scene';
 import { EVENT_MAP } from './lib/constants';
 import PluginConfig from './lib/plugin-config';
 
+
 export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
   config;
   interfaceScene;
@@ -70,7 +71,10 @@ export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
 
       return list.concat(
         scene.children.getChildren().filter(child => {
-          if (!child.input?.enabled || !child.getBounds) {
+          const canSelectChild = PluginConfig.get('childSelector')(child);
+
+          // If the child cannot be selected, or has not got any bounds
+          if (!canSelectChild || !child.getBounds) {
             return;
           }
 
