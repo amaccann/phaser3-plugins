@@ -149,17 +149,7 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
   };
 
   destroy(fromScene) {
-    const { scene } = this;
     super.destroy(fromScene);
-
-    scene.input.off('pointerdown', this.onCameraDragPointerDown);
-    scene.input.off('pointerup', this.onCameraDragPointerUp);
-    scene.input.off('pointermove', this.onCameraDragPointerMove);
-
-    scene.input.off('pointerdown', this.onPointerDown);
-    scene.input.off('pointerup', this.onPointerUp);
-    scene.input.off('pointermove', this.onPointerMove);
-    scene.input.off('gameover', this.onGameOver);
   }
 
   preUpdate() {

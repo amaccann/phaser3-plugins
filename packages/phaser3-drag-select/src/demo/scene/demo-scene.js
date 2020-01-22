@@ -30,7 +30,7 @@ export default class DemoScene extends Scene {
       zoomOut: keyboard.addKey(KeyCodes.E),
       acceleration: 0.001,
       drag: 0.0005,
-      maxSpeed: 1.0
+      maxSpeed: 1.0,
     };
 
     this.myControls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
@@ -45,9 +45,9 @@ export default class DemoScene extends Scene {
     let spriteKey;
     let y;
 
-    for (x; x <= length; x+=1) {
+    for (x; x <= length; x += 1) {
       y = 1;
-      for (y; y <= length; y+=1) {
+      for (y; y <= length; y += 1) {
         // Every even numbered item will be set as "interactive"
         setAsInteractive = x % 2 === 0;
         spriteKey = setAsInteractive ? 'enabled-sprite' : 'disabled-sprite';
@@ -78,16 +78,23 @@ export default class DemoScene extends Scene {
     this.selectedSpritesText.setText(`${sprites.length} sprites selected`);
   }
 
-  preload() {
-    this.load.scenePlugin('DragSelectPlugin', DragSelectPlugin, 'dragSelect', 'dragSelect');
+  setDemoKeyEvents() {
+    this.input.keyboard.on('keydown-R', () => {
+      this.scene.stop('DemoScene');
+      this.scene.launch('DemoScene2');
+      this.plugins.stop('dragSelect');
+    });
+  }
 
+  preload() {
     this.load.image('disabled-sprite', 'src/assets/disabled-sprite-50x50.png');
     this.load.image('enabled-sprite', 'src/assets/enabled-sprite-50x50.png');
   }
 
   create() {
-    console.log('dragSelect', this.dragSelect);
-    this.dragSelect.init({
+    console.log('DemoScene scene', this);
+    this.dragSelect = this.plugins.start('DragSelectPlugin', 'dragSelect');
+    this.dragSelect.setup(this, {
       camera: this.cameras.main,
       // childSelector: () => true, // select everything! :-)
       // dragCameraBy: false, // disable drag camera
@@ -107,6 +114,7 @@ export default class DemoScene extends Scene {
 
     this.createCamera();
     this.createSprites();
+    this.setDemoKeyEvents();
   }
 
   update(time, delta) {
