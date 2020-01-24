@@ -1,10 +1,22 @@
 import Phaser from 'phaser';
 
 import InterfaceScene, { SCENE_KEY } from './lib/interface-scene';
-import { EVENT_MAP } from './lib/constants';
 import PluginConfig from './lib/plugin-config';
 
+function doesSpriteOverlapWithSelection(child, rectangle) {
+  const camera = PluginConfig.get('camera');
+  const childBounds = child.getBounds();
+  const x = (childBounds.x - camera.worldView.x) * camera.zoom;
+  const y = (childBounds.y - camera.worldView.y) * camera.zoom;
+  const width = childBounds.width * camera.zoom;
+  const height = childBounds.height * camera.zoom;
+  const childRect = new Phaser.Geom.Rectangle(x, y, width, height);
+
+  return Phaser.Geom.Rectangle.Overlaps(rectangle, childRect);
+}
+
 export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
+  selectionCache = [];
   interfaceScene;
   scene;
   // scenePlugin;
@@ -24,7 +36,6 @@ export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
 
     this.scene = scene;
     this.createInterfaceScene();
-    this.addEmitterEventCallbacks();
   }
 
   get scenePlugin() {
@@ -33,50 +44,40 @@ export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
 
   createInterfaceScene() {
     const scenePlugin = this.scenePlugin;
-    this.interfaceScene = scenePlugin.get(SCENE_KEY) || new InterfaceScene(scenePlugin, this.config);
+    this.interfaceScene = scenePlugin.get(SCENE_KEY) || new InterfaceScene(scenePlugin, this);
     scenePlugin.launch(SCENE_KEY);
   }
 
-  addEmitterEventCallbacks() {
-    const eventEmitter = this.game.events;
-    // this.scenePlugin.events.on('shutdown', () => {
-    //   console.log('hi there')
-    // });
-
-    // eventEmitter.on('update', this.update, this);
-    //
-    //
-    // eventEmitter.on('pause', this.pause, this);
-    // eventEmitter.on('resume', this.resume, this);
-    //
-    // eventEmitter.on('shutdown', this.shutdown, this);
-    // eventEmitter.on('destroy', this.destroy, this);
-    //
-    this.interfaceScene.sys.events.on(EVENT_MAP.ON_MOUSE_UP, this.onMouseUp);
-  }
-
-  onMouseUp = rectangle => {
+  /**
+   * @param {Phaser.Geom.Rectangle} rectangle Selection rectangle
+   * @param {Boolean} isAmendActive "shift" key by default
+   * @param {Boolean} isToggleSelect "ctrl" key by default
+   */
+  onMouseUp = (rectangle, isAmendActive, isToggleSelect) => {
     const items = this.scene.children.getChildren().filter(child => {
       const canSelectChild = PluginConfig.get('childSelector')(child);
 
-      // If the child cannot be selected, or has not got any bounds
+      // If the child cannot be selected, has not got any bounds
       if (!canSelectChild || !child.getBounds) {
-        return;
+        return false;
       }
 
-      const camera = PluginConfig.get('camera');
-      const childBounds = child.getBounds();
-      const x = (childBounds.x - camera.worldView.x) * camera.zoom;
-      const y = (childBounds.y - camera.worldView.y) * camera.zoom;
-      const width = childBounds.width * camera.zoom;
-      const height = childBounds.height * camera.zoom;
-      const childRect = new Phaser.Geom.Rectangle(x, y, width, height);
-
-      return Phaser.Geom.Rectangle.Overlaps(rectangle, childRect);
+      return doesSpriteOverlapWithSelection(child, rectangle);
     });
 
-    console.log('items', items);
-    PluginConfig.get('onSelect')(items);
+    // If amend is active, ensure no duplicate references added.
+    if (isAmendActive) {
+      this.selectionCache = this.selectionCache.concat(items.filter(i => !this.selectionCache.includes(i)));
+      // If toggle is active, flip the selected / deselected list
+    } else if (isToggleSelect) {
+      const itemsToAdd = items.filter(i => !this.selectionCache.includes(i));
+      const cacheWithItemsRemoved = this.selectionCache.filter(i => !items.includes(i));
+      this.selectionCache = [...cacheWithItemsRemoved, ...itemsToAdd];
+    } else {
+      this.selectionCache = items;
+    }
+
+    PluginConfig.get('onSelect')(this.selectionCache);
   };
 
   stop() {

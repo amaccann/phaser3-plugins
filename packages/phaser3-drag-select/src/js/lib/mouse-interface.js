@@ -1,4 +1,3 @@
-import { EVENT_MAP } from './constants';
 import PluginConfig, { MOUSE_BUTTONS } from './plugin-config';
 
 const PREVENT_DEFAULT = e => e.preventDefault();
@@ -15,9 +14,17 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
   constructor(scene) {
     super(scene);
 
+    console.log('graphics', this);
     scene.add.existing(this);
     this.initialiseInputEvents();
     this.initialiseCameraDrag();
+  }
+
+  /**
+   * @return InterfaceScene
+   */
+  get dragPlugin() {
+    return this.scene.dragPlugin;
   }
 
   get isRightClickDisabled() {
@@ -101,8 +108,12 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
     this.isMouseDown = true;
   };
 
-  onPointerUp = pointer => {
+  onPointerUp = ({ event }) => {
     const { start, end } = this;
+    const amendKey = PluginConfig.get('mouseAmendSelectWith');
+    const toggleKey = PluginConfig.get('mouseToggleSelectWith');
+    const isAmendActive = event[`${amendKey}Key`];
+    const isToggleActive = event[`${toggleKey}Key`];
 
     this.isDragging = false;
     this.isMouseDown = false;
@@ -125,7 +136,7 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
     const height = maxY - minY;
     const rectangle = new Phaser.Geom.Rectangle(minX, minY, width, height);
 
-    this.scene.sys.events.emit(EVENT_MAP.ON_MOUSE_UP, rectangle);
+    this.dragPlugin.onMouseUp(rectangle, isAmendActive, isToggleActive);
   };
 
   enableRightClick(enable = true) {
