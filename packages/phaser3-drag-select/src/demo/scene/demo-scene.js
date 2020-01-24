@@ -6,6 +6,8 @@ import { forEach } from 'src/js/util';
 const { KeyCodes } = Phaser.Input.Keyboard;
 
 const ROTATE_BY = 0.025;
+const TINT_PREVIEW = 0x00ff00;
+const TINT_SELECTION = 0xff00ff;
 
 export default class DemoScene extends Scene {
   dragSelect;
@@ -63,12 +65,29 @@ export default class DemoScene extends Scene {
     }
   }
 
+  onPreview = sprites => {
+    forEach(this.children.getChildren(), sprite => {
+      // Ignore if already selected...
+      if (sprite.tintTopLeft === TINT_SELECTION) {
+        return;
+      }
+
+      // If one of the sprites under the selection, set tint
+      if (sprites.includes(sprite)) {
+        return sprite.setTint(TINT_PREVIEW);
+      }
+
+      // Otherwise, clear it.
+      sprite.setTint(0xffffff);
+    });
+
+    // sprites.forEach(sprite => sprite.setTint(0x00ff00));
+  };
+
   onSelect = sprites => {
     console.warn('sprites', sprites);
 
-    this.children.getChildren().forEach(obj => {
-      obj.setTint(0xffffff);
-    });
+    this.children.getChildren().forEach(s => s.setTint(0xffffff));
 
     sprites.forEach(sprite => sprite.setTint(0xff00ff));
     this.setSelectedSpritesText(sprites);
@@ -98,6 +117,7 @@ export default class DemoScene extends Scene {
       camera: this.cameras.main,
       // childSelector: () => true, // select everything! :-)
       // dragCameraBy: false, // disable drag camera
+      onPreview: this.onPreview,
       onSelect: this.onSelect,
       outlineColor: 0x00ff00,
       outlineWidth: 2,

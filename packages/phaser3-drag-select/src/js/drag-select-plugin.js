@@ -16,20 +16,10 @@ function doesSpriteOverlapWithSelection(child, rectangle) {
 }
 
 export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
+  previewCache = [];
   selectionCache = [];
   interfaceScene;
   scene;
-  // scenePlugin;
-
-  constructor(pluginManager) {
-    // console.log('constructor', scene);
-    console.log('pluginManager', pluginManager);
-    super(pluginManager);
-
-    // console.log('targetScene', scene);
-    console.log('this', this);
-    console.log('this', this.setup);
-  }
 
   setup(scene, config = {}) {
     PluginConfig.setConfig(config);
@@ -48,13 +38,8 @@ export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
     scenePlugin.launch(SCENE_KEY);
   }
 
-  /**
-   * @param {Phaser.Geom.Rectangle} rectangle Selection rectangle
-   * @param {Boolean} isAmendActive "shift" key by default
-   * @param {Boolean} isToggleSelect "ctrl" key by default
-   */
-  onMouseUp = (rectangle, isAmendActive, isToggleSelect) => {
-    const items = this.scene.children.getChildren().filter(child => {
+  getEachValidChildFromScene(rectangle) {
+    return this.scene.children.getChildren().filter(child => {
       const canSelectChild = PluginConfig.get('childSelector')(child);
 
       // If the child cannot be selected, has not got any bounds
@@ -64,6 +49,25 @@ export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
 
       return doesSpriteOverlapWithSelection(child, rectangle);
     });
+  }
+
+  /**
+   * @param {Phaser.Geom.Rectangle} rectangle Selection rectangle
+   */
+  onPointerMove = rectangle => {
+    this.previewCache = this.getEachValidChildFromScene(rectangle);
+
+    PluginConfig.get('onPreview')(this.previewCache);
+  };
+
+  /**
+   * @param {Phaser.Geom.Rectangle} rectangle Selection rectangle
+   * @param {Boolean} isAmendActive "shift" key by default
+   * @param {Boolean} isToggleSelect "ctrl" key by default
+   */
+  onPointerUp = (rectangle, isAmendActive, isToggleSelect) => {
+    this.previewCache = [];
+    const items = this.getEachValidChildFromScene(rectangle);
 
     // If amend is active, ensure no duplicate references added.
     if (isAmendActive) {

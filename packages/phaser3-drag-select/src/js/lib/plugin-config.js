@@ -34,6 +34,7 @@ export const PLUGIN_DEFAULT_CONFIG = {
   mouseToggleSelectWith: AMEND_SELECT_OPTIONS.CTRL,
   outlineColor: 0x00ff00,
   outlineWidth: 2,
+  onPreview: NOOP,
   onSelect: NOOP,
   rectBgColor: 0x33ff33,
   rectAlpha: 0.5,
