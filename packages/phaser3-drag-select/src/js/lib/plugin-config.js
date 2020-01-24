@@ -12,18 +12,26 @@ export const MOUSE_BUTTONS = {
   RIGHT: 2,
   MIDDLE: 4,
   FOURTH_BUTTON: 8,
-  FIFTH_BUTTON: 16
+  FIFTH_BUTTON: 16,
 };
 
 const MOUSE_BUTTONS_VALUES = Object.values(MOUSE_BUTTONS);
 
 export const IS_INTERACTIVE_CHILD = child => child.input?.enabled;
 
+export const AMEND_SELECT_OPTIONS = {
+  ALT: 'alt',
+  CTRL: 'ctrl',
+  SHIFT: 'shift',
+};
+
 export const PLUGIN_DEFAULT_CONFIG = {
   camera: null,
   childSelector: IS_INTERACTIVE_CHILD,
   dragCameraBy: MOUSE_BUTTONS.RIGHT,
   mouseClickToTrack: MOUSE_BUTTONS.LEFT,
+  mouseAmendSelectWith: AMEND_SELECT_OPTIONS.SHIFT,
+  mouseToggleSelectWith: AMEND_SELECT_OPTIONS.CTRL,
   outlineColor: 0x00ff00,
   outlineWidth: 2,
   onSelect: NOOP,
@@ -37,7 +45,7 @@ class PluginConfig {
   setConfig(data = {}) {
     this.data = {
       ...PLUGIN_DEFAULT_CONFIG,
-      ...data
+      ...data,
     };
   }
 

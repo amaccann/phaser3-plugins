@@ -24,6 +24,8 @@ this.dragSelect.setup(this, {
     childSelector: <Function>,
     dragCameraBy: 2, // right-button
     mouseClickToTrack: 1, // left-button
+    mouseAmendSelectWith: 'shift',
+    mouseToggleSelectWith: 'ctrl',
     outlineColor: 0x00ff00,
     outlineWidth: 2,
     onSelect: <Function>,
