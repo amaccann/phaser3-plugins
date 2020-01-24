@@ -10,6 +10,7 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
 
   start = new Phaser.Math.Vector2();
   end = new Phaser.Math.Vector2();
+  rectangle = new Phaser.Geom.Rectangle();
 
   constructor(scene) {
     super(scene);
@@ -109,7 +110,7 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
   };
 
   onPointerUp = ({ event }) => {
-    const { start, end } = this;
+    const { rectangle } = this;
     const amendKey = PluginConfig.get('mouseAmendSelectWith');
     const toggleKey = PluginConfig.get('mouseToggleSelectWith');
     const isAmendActive = event[`${amendKey}Key`];
@@ -121,6 +122,39 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
       return;
     }
 
+    this.updateSelectionRectangle();
+    this.dragPlugin.onPointerUp(rectangle, isAmendActive, isToggleActive);
+  };
+
+  enableRightClick(enable = true) {
+    const { scene } = this;
+    if (enable) {
+      scene.game.canvas.oncontextmenu = PREVENT_DEFAULT;
+    } else {
+      scene.game.canvas.oncontextmenu = undefined;
+    }
+  }
+
+  onPointerMove = ({ buttons, event, worldX, worldY }) => {
+    const isClickTypeToTrack = this.getIsValidClickToTrack(buttons);
+    const amendKey = PluginConfig.get('mouseAmendSelectWith');
+    const toggleKey = PluginConfig.get('mouseToggleSelectWith');
+    const isAmendActive = event[`${amendKey}Key`];
+    const isToggleActive = event[`${toggleKey}Key`];
+
+    if (!this.isMouseDown || !isClickTypeToTrack) {
+      return this;
+    }
+
+    this.isDragging = true;
+    this.end.setTo(worldX, worldY);
+
+    this.updateSelectionRectangle();
+    this.dragPlugin.onPointerMove(this.rectangle, isAmendActive, isToggleActive);
+  };
+
+  updateSelectionRectangle() {
+    const { end, rectangle, start } = this;
     const startX = start.x;
     const startY = start.y;
     const endX = end.x;
@@ -134,30 +168,9 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
 
     const width = maxX - minX;
     const height = maxY - minY;
-    const rectangle = new Phaser.Geom.Rectangle(minX, minY, width, height);
 
-    this.dragPlugin.onMouseUp(rectangle, isAmendActive, isToggleActive);
-  };
-
-  enableRightClick(enable = true) {
-    const { scene } = this;
-    if (enable) {
-      scene.game.canvas.oncontextmenu = PREVENT_DEFAULT;
-    } else {
-      scene.game.canvas.oncontextmenu = undefined;
-    }
+    rectangle.setTo(minX, minY, width, height);
   }
-
-  onPointerMove = pointer => {
-    const isClickTypeToTrack = this.getIsValidClickToTrack(pointer.buttons);
-
-    if (!this.isMouseDown || !isClickTypeToTrack) {
-      return this;
-    }
-
-    this.isDragging = true;
-    this.end.setTo(pointer.worldX, pointer.worldY);
-  };
 
   destroy(fromScene) {
     super.destroy(fromScene);
