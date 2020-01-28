@@ -12,6 +12,7 @@ const TINT_SELECTION = 0xff00ff;
 export default class DemoScene extends Scene {
   dragSelect;
   fpsText;
+  fullScreenBtn;
   myControls;
   mySprite;
 
@@ -36,6 +37,21 @@ export default class DemoScene extends Scene {
     };
 
     this.myControls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
+  }
+
+  createFullScreenButton() {
+    const { game } = this;
+    const { width } = game.config;
+    const offset = 32;
+    this.fullScreenBtn = this.add
+      .image(width - offset, offset, 'fullscreen', 0)
+      .setOrigin(1, 0)
+      .setScrollFactor(0)
+      .setInteractive();
+
+    this.input.keyboard.on('keydown-F', this.toggleFullScreenMode, this);
+
+    this.fullScreenBtn.on('pointerup', this.toggleFullScreenMode, this);
   }
 
   createSprites() {
@@ -105,9 +121,22 @@ export default class DemoScene extends Scene {
     });
   }
 
+  toggleFullScreenMode = () => {
+    if (this.scale.isFullscreen) {
+      this.fullScreenBtn.setFrame(0);
+
+      this.scale.stopFullscreen();
+    } else {
+      this.fullScreenBtn.setFrame(1);
+
+      this.scale.startFullscreen();
+    }
+  };
+
   preload() {
     this.load.image('disabled-sprite', 'src/assets/disabled-sprite-50x50.png');
     this.load.image('enabled-sprite', 'src/assets/enabled-sprite-50x50.png');
+    this.load.spritesheet('fullscreen', 'src/assets/fullscreen.png', { frameWidth: 64, frameHeight: 64 });
   }
 
   create() {
@@ -115,6 +144,8 @@ export default class DemoScene extends Scene {
     this.dragSelect = this.plugins.start('DragSelectPlugin', 'dragSelect');
     this.dragSelect.setup(this, {
       camera: this.cameras.main,
+      // cameraEdgeAcceleration: false, // set to false if you want to disable
+      // cameraEdgeBuffer: 50,
       // childSelector: () => true, // select everything! :-)
       // dragCameraBy: false, // disable drag camera
       onPreview: this.onPreview,
@@ -133,6 +164,7 @@ export default class DemoScene extends Scene {
     this.setSelectedSpritesText();
 
     this.createCamera();
+    this.createFullScreenButton();
     this.createSprites();
     this.setDemoKeyEvents();
   }

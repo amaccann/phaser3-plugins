@@ -27,6 +27,8 @@ export const AMEND_SELECT_OPTIONS = {
 
 export const PLUGIN_DEFAULT_CONFIG = {
   camera: null,
+  cameraEdgeAcceleration: 0.009,
+  cameraEdgeBuffer: 50,
   childSelector: IS_INTERACTIVE_CHILD,
   dragCameraBy: MOUSE_BUTTONS.RIGHT,
   mouseClickToTrack: MOUSE_BUTTONS.LEFT,

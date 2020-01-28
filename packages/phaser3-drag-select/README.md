@@ -21,6 +21,8 @@ const config = {
 this.dragSelect = this.plugins.start('DragSelectPlugin', 'dragSelect');
 this.dragSelect.setup(this, {
     camera: <MainGameSceneCamera>,
+    cameraEdgeAcceleration: 0.015,
+    cameraEdgeBuffer: 50,
     childSelector: <Function>,
     dragCameraBy: 2,        // right-button
     mouseClickToTrack: 1,   // left-button
