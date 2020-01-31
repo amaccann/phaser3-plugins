@@ -1,12 +1,11 @@
 {
   "name": "phaser3-drag-select",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Phaser3 Mouse Drag Select plugin",
   "main": "dist/phaser3-drag-select-plugin.js",
   "repository": "git@github.com:amaccann/phaser3-drag-select.git",
-  "author": "Andrew MacCann <amaccann@grubhub.com>",
+  "author": "Andrew MacCann <andrew.maccann@gmail.com>",
   "license": "MIT",
-  "private": true,
   "scripts": {
     "build": "webpack --config webpack/prod.js ",
     "lint": "prettier --write ./src/**/*.js",
