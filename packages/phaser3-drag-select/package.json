@@ -2,7 +2,7 @@
   "name": "phaser3-drag-select",
   "version": "1.0.0",
   "description": "Phaser3 Mouse Drag Select plugin",
-  "main": "index.js",
+  "main": "dist/phaser3-drag-select-plugin.js",
   "repository": "git@github.com:amaccann/phaser3-drag-select.git",
   "author": "Andrew MacCann <amaccann@grubhub.com>",
   "license": "MIT",
