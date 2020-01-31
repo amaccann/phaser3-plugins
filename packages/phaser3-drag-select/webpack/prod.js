@@ -1,13 +1,23 @@
-const merge = require('webpack-merge');
-const base = require('./base');
-const TerserPlugin = require('terser-webpack-plugin');
+const webpack = require('webpack');
 
-module.exports = merge(base, {
+const TerserPlugin = require('terser-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+
+const base = require('./base');
+const config = require('./config');
+
+module.exports = Object.assign(base, {
   mode: 'production',
+  devtool: 'source-map',
+  entry: `${config.SRC}/index.exports.js`,
+  externals: ['phaser'],
   output: {
-    filename: 'bundle.min.js',
+    filename: 'phaser3-drag-select-plugin.js',
+    path: config.DIST,
+    library: 'phaser3-drag-select',
+    libraryTarget: 'umd',
+    umdNamedDefine: true,
   },
-  devtool: false,
   performance: {
     maxEntrypointSize: 900000,
     maxAssetSize: 900000,
@@ -23,4 +33,22 @@ module.exports = merge(base, {
       }),
     ],
   },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: [/node_modules/],
+        use: {
+          loader: 'babel-loader',
+        },
+      },
+    ],
+  },
+  plugins: [
+    new CleanWebpackPlugin(),
+    new webpack.DefinePlugin({
+      CANVAS_RENDERER: JSON.stringify(true),
+      WEBGL_RENDERER: JSON.stringify(true),
+    }),
+  ],
 });
