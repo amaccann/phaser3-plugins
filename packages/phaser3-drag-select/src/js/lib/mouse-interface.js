@@ -18,7 +18,6 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
 
     scene.add.existing(this);
     this.initialiseInputEvents();
-    console.log('this.cameraDrag', this.cameraDrag);
     this.cameraDrag = new MouseCameraDrag(this);
   }
 
@@ -140,7 +139,6 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
 
   destroy(fromScene) {
     super.destroy(fromScene);
-    console.log('destroy scene', fromScene);
     this.cameraDrag.destroy(fromScene);
   }
 

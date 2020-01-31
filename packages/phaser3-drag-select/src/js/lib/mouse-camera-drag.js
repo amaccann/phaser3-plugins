@@ -104,7 +104,7 @@ export default class MouseCameraDrag extends Phaser.GameObjects.Graphics {
     const offsetWidth = width - cameraEdgeBuffer * 2;
     const offsetHeight = height - cameraEdgeBuffer * 2;
     this.clear();
-    this.fillStyle(0xffffff, 0.5);
+    this.fillStyle(0xffffff, 0);
     this.fillRect(cameraEdgeBuffer, cameraEdgeBuffer, offsetWidth, offsetHeight);
     this.rectangle.setTo(cameraEdgeBuffer, cameraEdgeBuffer, offsetWidth, offsetHeight);
   }
@@ -133,7 +133,6 @@ export default class MouseCameraDrag extends Phaser.GameObjects.Graphics {
 
   preDestroy() {
     const { scene } = this;
-    console.log('preDestroy');
     scene.scale.off('enterfullscreen', this.onToggleFullScreen, this);
     scene.scale.off('leavefullscreen', this.onToggleFullScreen, this);
 

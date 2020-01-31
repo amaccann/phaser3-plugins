@@ -6,12 +6,12 @@ export default class InterfaceScene extends Phaser.Scene {
   dragPlugin;
   mouseInterface;
 
-  constructor(scenePlugin, dragPlugin) {
-    super(SCENE_KEY);
+  constructor() {
+    super({ key: SCENE_KEY });
+  }
 
+  setDragPlugin(dragPlugin) {
     this.dragPlugin = dragPlugin;
-    scenePlugin.add(SCENE_KEY, this, true);
-    scenePlugin.bringToTop(SCENE_KEY);
   }
 
   create() {
