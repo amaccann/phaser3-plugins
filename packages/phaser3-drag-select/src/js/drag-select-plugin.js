@@ -35,10 +35,16 @@ export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
   createInterfaceScene() {
     const scenePlugin = this.scenePlugin;
     if (scenePlugin.get(SCENE_KEY)) {
-      scenePlugin.launch(SCENE_KEY);
+      return scenePlugin.launch(SCENE_KEY);
     }
 
-    this.interfaceScene = scenePlugin.get(SCENE_KEY) || new InterfaceScene(scenePlugin, this);
+    scenePlugin.add(SCENE_KEY, InterfaceScene, true);
+    scenePlugin.bringToTop(SCENE_KEY);
+
+    this.interfaceScene = scenePlugin.get(SCENE_KEY);
+    if (this.interfaceScene) {
+      this.interfaceScene.setDragPlugin(this);
+    }
   }
 
   getEachValidChildFromScene(rectangle) {

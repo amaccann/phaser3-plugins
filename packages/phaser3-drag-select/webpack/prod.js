@@ -9,10 +9,12 @@ const config = require('./config');
 module.exports = Object.assign(base, {
   mode: 'production',
   devtool: 'source-map',
-  entry: `${config.SRC}/index.exports.js`,
+  entry: {
+    plugin: `${config.SRC}/index.exports.js`,
+  },
   externals: ['phaser'],
   output: {
-    filename: 'phaser3-drag-select-plugin.js',
+    filename: 'phaser3-drag-select-[name].js',
     path: config.DIST,
     library: 'phaser3-drag-select',
     libraryTarget: 'umd',
