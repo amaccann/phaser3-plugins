@@ -1,0 +1,12 @@
+{
+  "name": "phaser3-plugins",
+  "version": "0.0.1",
+  "description": "Monorepo to store collection of phaser3 plugins",
+  "main": "index.js",
+  "repository": "git@github.com:amaccann/phaser3-plugins.git",
+  "author": "Andrew MacCann <andrew.maccann@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "lerna": "^3.20.2"
+  }
+}
