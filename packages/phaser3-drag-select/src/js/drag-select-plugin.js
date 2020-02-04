@@ -18,6 +18,7 @@ function doesSpriteOverlapWithSelection(child, rectangle) {
 /**
  * @class DragSelectPlugin
  * @extends Phaser.Plugins.BasePlugin
+ * @description Phaser3, Drag Selection plugin
  */
 export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
   previewCache = [];
