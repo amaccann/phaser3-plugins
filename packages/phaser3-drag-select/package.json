@@ -3,7 +3,10 @@
   "version": "1.1.9",
   "description": "Phaser3 Mouse Drag Select plugin",
   "main": "dist/phaser3-drag-select-plugin.js",
-  "repository": "git@github.com:amaccann/phaser3-plugins.git",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:amaccann/phaser3-plugins.git"
+  },
   "author": "Andrew MacCann <andrew.maccann@gmail.com>",
   "license": "MIT",
   "publishConfig": {
