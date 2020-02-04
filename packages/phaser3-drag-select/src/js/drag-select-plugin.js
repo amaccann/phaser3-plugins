@@ -119,7 +119,7 @@ export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
 
   start() {
     super.start();
-    console.log('🤖 DragSelect Plugin started.');
+    console.log('🤖 DragSelect Plugin started...');
   }
 
   /**
