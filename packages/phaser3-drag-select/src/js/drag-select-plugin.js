@@ -117,6 +117,11 @@ export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
     this.scenePlugin.stop(SCENE_KEY);
   }
 
+  start() {
+    super.start();
+    console.log('🤖 DragSelect Plugin started.');
+  }
+
   /**
    * @method setConfig
    * @description Updates the plugin's configuration with new values
