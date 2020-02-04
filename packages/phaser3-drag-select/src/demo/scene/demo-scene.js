@@ -81,7 +81,7 @@ export default class DemoScene extends Scene {
     }
   }
 
-  onPreview = sprites => {
+  onPreview = ({ items }) => {
     forEach(this.children.getChildren(), sprite => {
       // Ignore if already selected...
       if (sprite.tintTopLeft === TINT_SELECTION) {
@@ -89,7 +89,7 @@ export default class DemoScene extends Scene {
       }
 
       // If one of the sprites under the selection, set tint
-      if (sprites.includes(sprite)) {
+      if (items.includes(sprite)) {
         return sprite.setTint(TINT_PREVIEW);
       }
 
@@ -100,13 +100,13 @@ export default class DemoScene extends Scene {
     // sprites.forEach(sprite => sprite.setTint(0x00ff00));
   };
 
-  onSelect = sprites => {
-    console.warn('sprites', sprites);
+  onSelect = ({ items }) => {
+    console.warn('items', items);
 
     this.children.getChildren().forEach(s => s.setTint(0xffffff));
 
-    sprites.forEach(sprite => sprite.setTint(0xff00ff));
-    this.setSelectedSpritesText(sprites);
+    items.forEach(sprite => sprite.setTint(0xff00ff));
+    this.setSelectedSpritesText(items);
   };
 
   setSelectedSpritesText(sprites = []) {

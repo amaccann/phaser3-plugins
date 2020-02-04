@@ -85,15 +85,18 @@ export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
   onPointerMove = rectangle => {
     this.previewCache = this.getEachValidChildFromScene(rectangle);
 
-    PluginConfig.get('onPreview')(this.previewCache);
+    PluginConfig.get('onPreview')({
+      items: this.previewCache,
+    });
   };
 
   /**
    * @param {Phaser.Geom.Rectangle} rectangle Selection rectangle
    * @param {Boolean} isAmendActive "shift" key by default
    * @param {Boolean} isToggleSelect "ctrl" key by default
+   * @param {Boolean} isSingleClick does it count as a "single" click?
    */
-  onPointerUp = (rectangle, isAmendActive, isToggleSelect) => {
+  onPointerUp = (rectangle, isAmendActive, isToggleSelect, isSingleClick) => {
     this.previewCache = [];
     const items = this.getEachValidChildFromScene(rectangle);
 
@@ -109,7 +112,12 @@ export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
       this.selectionCache = items;
     }
 
-    PluginConfig.get('onSelect')(this.selectionCache);
+    PluginConfig.get('onSelect')({
+      items: this.selectionCache,
+      isAmendActive,
+      isSingleClick,
+      isToggleSelect,
+    });
   };
 
   stop() {

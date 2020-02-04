@@ -1,5 +1,6 @@
 import PluginConfig, { MOUSE_BUTTONS } from './plugin-config';
 import MouseCameraDrag from './mouse-camera-drag';
+import Phaser from 'phaser';
 
 const PREVENT_DEFAULT = e => e.preventDefault();
 
@@ -86,6 +87,15 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
     }
   }
 
+  getEventExtras(event) {
+    const amendKey = PluginConfig.get('mouseAmendSelectWith');
+    const toggleKey = PluginConfig.get('mouseToggleSelectWith');
+    const isAmendActive = event[`${amendKey}Key`];
+    const isToggleActive = event[`${toggleKey}Key`];
+
+    return { isAmendActive, isToggleActive };
+  }
+
   onGameOver = (time, event) => {
     const isClickTypeToTrack = this.getIsValidClickToTrack(event.buttons);
     if (!isClickTypeToTrack) {
@@ -110,27 +120,22 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
 
   onPointerUp = ({ event }) => {
     const { rectangle } = this;
-    const amendKey = PluginConfig.get('mouseAmendSelectWith');
-    const toggleKey = PluginConfig.get('mouseToggleSelectWith');
-    const isAmendActive = event[`${amendKey}Key`];
-    const isToggleActive = event[`${toggleKey}Key`];
-
+    const { isAmendActive, isToggleActive } = this.getEventExtras(event);
     this.isDragging = false;
     this.isMouseDown = false;
     if (this.cameraDrag.isDown) {
       return;
     }
 
+    const area = Phaser.Geom.Rectangle.Area(rectangle);
+    const isSingleClick = area <= PluginConfig.get('singleClickThreshold');
     this.updateSelectionRectangle();
-    this.dragPlugin.onPointerUp(rectangle, isAmendActive, isToggleActive);
+    this.dragPlugin.onPointerUp(rectangle, isAmendActive, isToggleActive, isSingleClick);
   };
 
   onPointerMove = ({ buttons, event, worldX, worldY }) => {
     const isClickTypeToTrack = this.getIsValidClickToTrack(buttons);
-    const amendKey = PluginConfig.get('mouseAmendSelectWith');
-    const toggleKey = PluginConfig.get('mouseToggleSelectWith');
-    const isAmendActive = event[`${amendKey}Key`];
-    const isToggleActive = event[`${toggleKey}Key`];
+    const { isAmendActive, isToggleActive } = this.getEventExtras(event);
 
     if (!this.isMouseDown || !isClickTypeToTrack) {
       return this;
@@ -140,7 +145,7 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
     this.end.setTo(worldX, worldY);
 
     this.updateSelectionRectangle();
-    this.dragPlugin.onPointerMove(this.rectangle, isAmendActive, isToggleActive);
+    this.dragPlugin.onPointerMove(this.rectangle, isAmendActive, isToggleActive, false);
   };
 
   updateSelectionRectangle() {

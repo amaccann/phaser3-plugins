@@ -34,6 +34,7 @@ this.dragSelect.setup(this, {
     onSelect: <Function>,
     rectBgColor: 0x33ff33,
     rectAlpha: 0.5,
+    singleClickThreshold: 20,
 });
 ```
 

@@ -40,6 +40,7 @@ export const PLUGIN_DEFAULT_CONFIG = {
   onSelect: NOOP,
   rectBgColor: 0x33ff33,
   rectAlpha: 0.5,
+  singleClickThreshold: 20,
 };
 
 class PluginConfig {
