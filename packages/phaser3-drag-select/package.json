@@ -8,6 +8,7 @@
   "license": "MIT",
   "scripts": {
     "build": "webpack --config webpack/prod.js ",
+    "build-and-publish": "yarn build && yarn publish",
     "lint": "prettier --write ./src/**/*.js",
     "start": "webpack-dev-server --config webpack/base.js --open",
     "watch": "npm-watch"
