@@ -48,6 +48,7 @@ class PluginConfig {
   setConfig(data = {}) {
     this.data = {
       ...PLUGIN_DEFAULT_CONFIG,
+      ...this.data,
       ...data,
     };
   }

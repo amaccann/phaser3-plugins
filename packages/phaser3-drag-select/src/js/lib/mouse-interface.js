@@ -17,7 +17,7 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
     super(scene);
 
     scene.add.existing(this);
-    this.initialiseInputEvents();
+    this.enableInputEvents();
     this.cameraDrag = new MouseCameraDrag(this);
   }
 
@@ -28,12 +28,45 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
     return this.scene.dragPlugin;
   }
 
+  disable() {
+    this.isDisabled = true;
+    this.isDragging = false;
+    this.isMouseDown = false;
+
+    this.start.reset();
+    this.end.reset();
+    this.rectangle.setEmpty();
+    this.clear();
+
+    this.disableInputEvents();
+    this.cameraDrag.disableInputEvents();
+
+    this.dragPlugin.onPointerUp(this.rectangle, false, false);
+  }
+
+  enable() {
+    this.isDisabled = false;
+
+    this.enableInputEvents();
+    this.cameraDrag.enableInputEvents();
+  }
+
   getIsValidClickToTrack = button => {
     const mouseClickToTrack = PluginConfig.get('mouseClickToTrack');
     return button === mouseClickToTrack;
   };
 
-  initialiseInputEvents() {
+  disableInputEvents() {
+    const { scene } = this;
+
+    scene.game.canvas.oncontextmenu = undefined;
+    scene.input.off('pointerdown', this.onPointerDown);
+    scene.input.off('pointerup', this.onPointerUp);
+    scene.input.off('pointermove', this.onPointerMove);
+    scene.input.off('gameover', this.onGameOver);
+  }
+
+  enableInputEvents() {
     const { scene } = this;
 
     this.enableRightClick();
@@ -42,6 +75,15 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
     scene.input.on('pointerup', this.onPointerUp);
     scene.input.on('pointermove', this.onPointerMove);
     scene.input.on('gameover', this.onGameOver);
+  }
+
+  enableRightClick(enable = true) {
+    const { scene } = this;
+    if (enable) {
+      scene.game.canvas.oncontextmenu = PREVENT_DEFAULT;
+    } else {
+      scene.game.canvas.oncontextmenu = undefined;
+    }
   }
 
   onGameOver = (time, event) => {
@@ -83,15 +125,6 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
     this.dragPlugin.onPointerUp(rectangle, isAmendActive, isToggleActive);
   };
 
-  enableRightClick(enable = true) {
-    const { scene } = this;
-    if (enable) {
-      scene.game.canvas.oncontextmenu = PREVENT_DEFAULT;
-    } else {
-      scene.game.canvas.oncontextmenu = undefined;
-    }
-  }
-
   onPointerMove = ({ buttons, event, worldX, worldY }) => {
     const isClickTypeToTrack = this.getIsValidClickToTrack(buttons);
     const amendKey = PluginConfig.get('mouseAmendSelectWith');
@@ -130,11 +163,7 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
   }
 
   preDestroy() {
-    const { scene } = this;
-    scene.input.off('pointerdown', this.onPointerDown);
-    scene.input.off('pointerup', this.onPointerUp);
-    scene.input.off('pointermove', this.onPointerMove);
-    scene.input.off('gameover', this.onGameOver);
+    this.disableInputEvents();
   }
 
   destroy(fromScene) {
