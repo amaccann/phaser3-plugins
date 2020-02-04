@@ -1,11 +1,19 @@
 ### Phaser 3 Drag Select Plugin
 
+### How to install:
+
+Add it to your project as a normal dependency:
+
+```
+yarn add @pixelburp/phaser3-drag-select
+```
+
 ### How to use:
 
 This operates as a global plugin in your Phaser Game, then loading it into your main gameplay scene. First you must define the new global plugin in your game's global config:
 
 ```
-import DragSelectPlugin from 'path-to';
+import DragSelectPlugin from '@pixelburp/phaser3-drag-select';
 // ... any other imports for your project...
 
 const config = {
