@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "prebuild-and-publish": "npm login",
-    "build-and-publish": "lerna run build --parallel && lerna publish"
+    "build-and-publish": "lerna run build --parallel && lerna publish -- --access public"
   },
   "devDependencies": {
     "lerna": "^3.20.2",
