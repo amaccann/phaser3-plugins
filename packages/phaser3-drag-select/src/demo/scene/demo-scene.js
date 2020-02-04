@@ -55,13 +55,11 @@ export default class DemoScene extends Scene {
   }
 
   createSprites() {
+    let sprite, setAsInteractive, spriteKey, y, worldX, worldY;
     this.mySprites = [];
     let x = 1;
     const length = 5;
-    let sprite;
-    let setAsInteractive;
-    let spriteKey;
-    let y;
+    const OFFSET = 200;
 
     for (x; x <= length; x += 1) {
       y = 1;
@@ -69,7 +67,9 @@ export default class DemoScene extends Scene {
         // Every even numbered item will be set as "interactive"
         setAsInteractive = x % 2 === 0;
         spriteKey = setAsInteractive ? 'enabled-sprite' : 'disabled-sprite';
-        sprite = new Phaser.GameObjects.Sprite(this, x * 100, y * 100, spriteKey);
+        worldX = x * 100 + OFFSET;
+        worldY = y * 100 + OFFSET;
+        sprite = new Phaser.GameObjects.Sprite(this, worldX, worldY, spriteKey);
 
         if (setAsInteractive) {
           sprite.setInteractive();
@@ -114,10 +114,23 @@ export default class DemoScene extends Scene {
   }
 
   setDemoKeyEvents() {
-    this.input.keyboard.on('keydown-R', () => {
-      this.scene.stop('DemoScene');
-      this.scene.launch('DemoScene2');
-      this.plugins.stop('dragSelect');
+    const { input, plugins, scene } = this;
+    const { keyboard } = input;
+
+    // Test pausing / disabling the plugin
+    keyboard.on('keydown-P', () => {
+      if (this.dragSelect.isEnabled) {
+        this.dragSelect.disable();
+      } else {
+        this.dragSelect.enable();
+      }
+    });
+
+    // Test swapping scenes to show the Plugin being stopped / restarted
+    keyboard.on('keydown-R', () => {
+      scene.stop('DemoScene');
+      scene.launch('DemoScene2');
+      plugins.stop('dragSelect');
     });
   }
 

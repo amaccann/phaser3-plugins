@@ -42,6 +42,20 @@ export default class MouseCameraDrag extends Phaser.GameObjects.Graphics {
     return !!this.scene.game.canvas.oncontextmenu;
   }
 
+  disableInputEvents() {
+    const { scene } = this;
+    scene.input.off('pointerdown', this.onCameraDragPointerDown);
+    scene.input.off('pointerup', this.onCameraDragPointerUp);
+    scene.input.off('pointermove', this.onCameraDragPointerMove);
+  }
+
+  enableInputEvents() {
+    const { scene } = this;
+    scene.input.on('pointerdown', this.onCameraDragPointerDown);
+    scene.input.on('pointerup', this.onCameraDragPointerUp);
+    scene.input.on('pointermove', this.onCameraDragPointerMove);
+  }
+
   initialiseCameraDrag() {
     const { scene } = this;
     const isContextMenuEnabled = !this.isRightClickDisabled;
@@ -56,13 +70,10 @@ export default class MouseCameraDrag extends Phaser.GameObjects.Graphics {
     scene.scale.on('enterfullscreen', this.onToggleFullScreen, this);
     scene.scale.on('leavefullscreen', this.onToggleFullScreen, this);
 
-    scene.input.on('pointerdown', this.onCameraDragPointerDown);
-    scene.input.on('pointerup', this.onCameraDragPointerUp);
-    scene.input.on('pointermove', this.onCameraDragPointerMove);
+    this.enableInputEvents();
   }
 
   onCameraDragPointerDown = pointer => {
-    console.warn('onCameraDragPointerDown', pointer.buttons);
     this.isCameraDragDown = PluginConfig.get('dragCameraBy') === pointer.buttons;
   };
 
@@ -136,9 +147,7 @@ export default class MouseCameraDrag extends Phaser.GameObjects.Graphics {
     scene.scale.off('enterfullscreen', this.onToggleFullScreen, this);
     scene.scale.off('leavefullscreen', this.onToggleFullScreen, this);
 
-    scene.input.off('pointerdown', this.onCameraDragPointerDown);
-    scene.input.off('pointerup', this.onCameraDragPointerUp);
-    scene.input.off('pointermove', this.onCameraDragPointerMove);
+    this.disableInputEvents();
   }
 
   destroy(fromScene) {

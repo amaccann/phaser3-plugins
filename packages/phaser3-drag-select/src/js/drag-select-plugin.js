@@ -21,11 +21,25 @@ export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
   interfaceScene;
   scene;
 
+  /**
+   * @method setup
+   * @param {Phaser.Scene} scene - Target scene to attach the plugin's logic against
+   * @param {Object} config - Configuration object to pass to plugin
+   */
   setup(scene, config = {}) {
-    PluginConfig.setConfig(config);
-
     this.scene = scene;
+
+    this.setConfig(config);
     this.createInterfaceScene();
+  }
+
+  /**
+   * @method isEnabled
+   * @description Returns the current "enabled" status of the Plugin's "interface" scene
+   * @returns {Boolean}
+   */
+  get isEnabled() {
+    return !this.interfaceScene.isDisabled;
   }
 
   get scenePlugin() {
@@ -98,13 +112,32 @@ export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
     this.scenePlugin.stop(SCENE_KEY);
   }
 
-  //  Called when a Scene is paused. A paused scene doesn't have its Step run, but still renders.
-  pause() {
-    console.log('pause');
+  /**
+   * @method setConfig
+   * @description Updates the plugin's configuration with new values
+   * @param {Object} config - new configuration object
+   */
+  setConfig(config = {}) {
+    PluginConfig.setConfig(config);
   }
 
-  //  Called when a Scene is resumed from a paused state.
-  resume() {
-    console.log('resume');
+  /**
+   * @method disable
+   * @description If enabled, disable the plugin
+   */
+  disable() {
+    if (this.isEnabled) {
+      this.interfaceScene.disable();
+    }
+  }
+
+  /**
+   * @method enable
+   * @description If not already enabled, enable the plugin
+   */
+  enable() {
+    if (!this.isEnabled) {
+      this.interfaceScene.enable();
+    }
   }
 }
