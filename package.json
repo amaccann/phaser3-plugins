@@ -6,7 +6,8 @@
   "repository": "git@github.com:amaccann/phaser3-plugins.git",
   "author": "Andrew MacCann <andrew.maccann@gmail.com>",
   "license": "MIT",
-  "dependencies": {
-    "lerna": "^3.20.2"
+  "devDependencies": {
+    "lerna": "^3.20.2",
+    "lerna-wizard": "^1.1.1"
   }
 }
