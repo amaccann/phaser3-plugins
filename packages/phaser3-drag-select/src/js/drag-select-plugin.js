@@ -15,6 +15,10 @@ function doesSpriteOverlapWithSelection(child, rectangle) {
   return Phaser.Geom.Rectangle.Overlaps(rectangle, childRect);
 }
 
+/**
+ * @class DragSelectPlugin
+ * @extends Phaser.Plugins.BasePlugin
+ */
 export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
   previewCache = [];
   selectionCache = [];
