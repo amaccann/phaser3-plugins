@@ -110,7 +110,13 @@ export default class DemoScene extends Scene {
   };
 
   setSelectedSpritesText(sprites = []) {
-    this.selectedSpritesText.setText(`${sprites.length} sprites selected`);
+    const isPluginEnabled = this.dragSelect.isEnabled;
+
+    this.selectedSpritesText.setText(`
+${sprites.length} sprites selected
+Press [P] to enable/disable the plugin (enabled: ${isPluginEnabled})
+Press [R] to swap scenes
+    `);
   }
 
   setDemoKeyEvents() {
@@ -124,6 +130,7 @@ export default class DemoScene extends Scene {
       } else {
         this.dragSelect.enable();
       }
+      this.setSelectedSpritesText();
     });
 
     // Test swapping scenes to show the Plugin being stopped / restarted
@@ -172,7 +179,7 @@ export default class DemoScene extends Scene {
     this.fpsText = this.add.text(10, 10, '');
     this.fpsText.setScrollFactor(0);
 
-    this.selectedSpritesText = this.add.text(200, 10, '');
+    this.selectedSpritesText = this.add.text(10, 30, '');
     this.selectedSpritesText.setScrollFactor(0);
     this.setSelectedSpritesText();
 
