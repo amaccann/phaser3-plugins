@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
+
 import PluginConfig from './lib/plugin-config';
-import HealthBar from './lib/health-bar';
+import HealthBarScene, { SCENE_KEY } from './lib/health-bar-scene';
 
 /**
  * @class HealthBarPlugin
@@ -12,19 +13,33 @@ export default class HealthBarPlugin extends Phaser.Plugins.BasePlugin {
    * @name scene
    * @type Phaser.Scene
    */
-  scene;
   cache = new Set();
+  healthBarScene;
+  scene;
 
   setup(scene, config = {}) {
     this.scene = scene;
-    console.log('scene', scene);
     this.setConfig(config);
+    this.createScene();
     this.setInitialCache();
     this.bindToDisplayList();
   }
 
+  /**
+   * @method isEnabled
+   * @description Returns the current "enabled" status of the Plugin's "interface" scene
+   * @returns {Boolean}
+   */
+  get isEnabled() {
+    return !this.healthBarScene.isDisabled;
+  }
+
   get displayList() {
     return this.scene.children;
+  }
+
+  get scenePlugin() {
+    return this.scene.scene;
   }
 
   bindToDisplayList() {
@@ -34,15 +49,51 @@ export default class HealthBarPlugin extends Phaser.Plugins.BasePlugin {
     displayList.removeCallback = this.removeHealthBarFromChild;
   }
 
+  createScene() {
+    const scenePlugin = this.scenePlugin;
+
+    if (scenePlugin.get(SCENE_KEY)) {
+      return scenePlugin.launch(SCENE_KEY);
+    }
+
+    scenePlugin.add(SCENE_KEY, HealthBarScene, true);
+    scenePlugin.bringToTop(SCENE_KEY);
+
+    this.healthBarScene = scenePlugin.get(SCENE_KEY);
+    if (this.healthBarScene) {
+      this.healthBarScene.setPlugin(this);
+    }
+  }
+
+  /**
+   * @method disable
+   * @description If enabled, disable the plugin
+   */
+  disable() {
+    if (this.isEnabled) {
+      this.healthBarScene.disable();
+    }
+  }
+
+  /**
+   * @method enable
+   * @description If not already enabled, enable the plugin
+   */
+  enable() {
+    if (!this.isEnabled) {
+      this.healthBarScene.enable();
+    }
+  }
+
   addHealthBarToChild = child => {
-    const { cache, scene } = this;
+    const { cache, healthBarScene } = this;
     const isValidChild = PluginConfig.get('childSelector')(child);
     const isAlreadyInCache = cache.has(child);
     if (isAlreadyInCache || !isValidChild) {
       return;
     }
 
-    child.healthBar = new HealthBar(scene, child);
+    healthBarScene.addHealthBar(child);
     cache.add(child);
   };
 
@@ -66,7 +117,7 @@ export default class HealthBarPlugin extends Phaser.Plugins.BasePlugin {
 
   stop() {
     super.stop();
-    console.log('plugin stopped');
+    this.scenePlugin.stop(SCENE_KEY);
   }
 
   // start() {

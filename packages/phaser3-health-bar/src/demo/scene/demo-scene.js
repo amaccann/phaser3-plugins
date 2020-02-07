@@ -45,8 +45,14 @@ export default class DemoScene extends Scene {
         worldX = x * 100 + OFFSET;
         worldY = y * 100 + OFFSET;
         sprite = new Phaser.GameObjects.Sprite(this, worldX, worldY, spriteKey);
-        this.physics.world.enable([ sprite ]);
-        sprite.body.setVelocity(-50, 100).setBounce(1, 1).setCollideWorldBounds(true);
+        this.physics.world.enable([sprite]);
+        sprite.health = 55;
+        sprite.maxHealth = 100;
+        sprite.minHealth = 0;
+        sprite.body
+          .setVelocity(-50, 100)
+          .setBounce(1, 1)
+          .setCollideWorldBounds(true);
 
         if (setAsInteractive) {
           sprite.setInteractive();
@@ -64,7 +70,7 @@ export default class DemoScene extends Scene {
 
     // Test on killing a sprite
     keyboard.on('keydown-R', () => {
-      const randomIndex = Phaser.Math.Between(0, mySprites.length -1);
+      const randomIndex = Phaser.Math.Between(0, mySprites.length - 1);
       const sprite = mySprites[randomIndex];
 
       if (sprite) {
@@ -72,10 +78,6 @@ export default class DemoScene extends Scene {
         this.mySprites = mySprites.filter(s => s !== sprite);
       }
     });
-  }
-
-  updateSprites() {
-
   }
 
   preload() {
@@ -91,18 +93,29 @@ export default class DemoScene extends Scene {
 
     this.healthBarPlugin = this.plugins.start('HealthBarPlugin', 'healthBarPlugin');
     this.healthBarPlugin.setup(this, {
+      barHeight: 15,
       backgroundColor: 0xff00ff,
+      camera: this.cameras.main,
       currentValueColor: 0x00ff00,
+      offsetY: 10,
       outlineColor: 0xffffff,
       outlineWidth: 2,
       // childSelector: (child) => child.input?.enabled,
-      propToWatch: 'health',
-      visibleOn: ['hover'],
+      propToWatch: {
+        current: 'health',
+        max: 'maxHealth',
+        min: 'minHealth',
+      },
+      visibleOnSelector: child => {
+        const { input } = this;
+        const { activePointer } = input;
+        // If pointer overlaps with child, or other conditions
+        return child.isSelected || child.input?.enabled;
+      },
     });
 
     this.fpsText = this.add.text(10, 10, '');
     this.fpsText.setScrollFactor(0);
-
   }
 
   update(time, delta) {
