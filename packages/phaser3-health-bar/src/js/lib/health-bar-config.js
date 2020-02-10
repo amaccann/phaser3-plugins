@@ -16,6 +16,11 @@ export default class HealthBarConfig {
    */
   backgroundColor = 0x000000;
   /**
+   * @name backgroundColorGradient
+   * @type Number
+   */
+  backgroundColorGradient = 0.8;
+  /**
    * @name barHeight
    * @type Number
    */
@@ -25,6 +30,11 @@ export default class HealthBarConfig {
    * @type Number
    */
   currentValueColor = 0x33ff33;
+  /**
+   * @name currentValueColorGradient
+   * @type Number
+   */
+  currentValueColorGradient = 0.8;
   /**
    * @name outlineColor
    * @type Number

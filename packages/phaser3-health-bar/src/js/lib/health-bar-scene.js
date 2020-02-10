@@ -14,6 +14,15 @@ export default class HealthBarScene extends Phaser.Scene {
     super({ key: SCENE_KEY });
   }
 
+  createOnePixelTexture() {
+    const graphics = this.make
+      .graphics()
+      .fillStyle(0xffffff)
+      .fillRect(0, 0, 1, 1);
+    graphics.generateTexture(ONE_PX_PNG_KEY, 1, 1);
+    graphics.destroy();
+  }
+
   setPlugin(plugin) {
     this.plugin = plugin;
   }
@@ -28,6 +37,10 @@ export default class HealthBarScene extends Phaser.Scene {
 
   enable() {
     this.isDisabled = false;
+  }
+
+  create() {
+    this.createOnePixelTexture();
   }
 
   update(time, delta) {

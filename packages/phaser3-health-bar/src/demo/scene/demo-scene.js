@@ -33,7 +33,7 @@ export default class DemoScene extends Scene {
     let sprite, setAsInteractive, spriteKey, y, worldX, worldY;
     this.mySprites = [];
     let x = 1;
-    const length = 1;
+    const length = 5;
     const OFFSET = 200;
 
     for (x; x <= length; x += 1) {
@@ -109,6 +109,7 @@ export default class DemoScene extends Scene {
     const defaultBarConfig = {
       barHeight: 15,
       backgroundColor: 0x0019c7,
+      backgroundColorGradient: 0.8,
       outlineColor: 0xffffff,
       camera: this.cameras.main,
       outlineWidth: 2,
@@ -133,6 +134,7 @@ export default class DemoScene extends Scene {
         {
           ...defaultBarConfig,
           currentValueColor: 0x00ff00,
+          currentValueColorGradient: 0.8,
           propsToWatch: {
             current: 'health',
             max: 'maxHealth',
