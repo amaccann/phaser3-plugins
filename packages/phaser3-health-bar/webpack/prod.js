@@ -2,6 +2,7 @@ const webpack = require('webpack');
 
 const TerserPlugin = require('terser-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const base = require('./base');
 const config = require('./config');
@@ -14,9 +15,9 @@ module.exports = Object.assign(base, {
   },
   externals: ['phaser'],
   output: {
-    filename: 'phaser3-drag-select-[name].js',
+    filename: 'phaser3-health-bar-[name].js',
     path: config.DIST,
-    library: 'phaser3-drag-select',
+    library: 'phaser3-health-bar',
     libraryTarget: 'umd',
     umdNamedDefine: true,
   },
@@ -44,6 +45,11 @@ module.exports = Object.assign(base, {
           loader: 'babel-loader',
         },
       },
+      {
+        test: /\.(gif|png|jpe?g|svg|xml)$/i,
+        include: [config.ASSETS],
+        use: 'file-loader',
+      },
     ],
   },
   plugins: [
@@ -52,5 +58,12 @@ module.exports = Object.assign(base, {
       CANVAS_RENDERER: JSON.stringify(true),
       WEBGL_RENDERER: JSON.stringify(true),
     }),
+    new CopyPlugin([
+      {
+        from: config.ASSETS,
+        to: config.ASSETS_FOLDER_NAME,
+        ignore: ['demo/*.png'],
+      },
+    ]),
   ],
 });

@@ -1,13 +1,28 @@
 import Phaser from 'phaser';
+import HealthBarConfig from './health-bar-config';
 import PluginConfig from './plugin-config';
+
+const DEFAULT_WIDTH = 50;
 
 export default class BarGraphics extends Phaser.GameObjects.Graphics {
   child;
+  /**
+   * @name config
+   * @type HealthBarConfig
+   */
+  config;
+  offset;
 
-  constructor(scene, child) {
+  constructor(scene, child, config, offset) {
     super(scene);
     this.child = child;
+    this.config = config;
+    this.offset = offset;
     this.drawAll();
+  }
+
+  get childWidth() {
+    return this.child?.width || DEFAULT_WIDTH;
   }
 
   drawAll() {}
@@ -19,17 +34,18 @@ export default class BarGraphics extends Phaser.GameObjects.Graphics {
   }
 
   update(time, delta) {
-    const { child } = this;
-    // const visibleOnSelector = PluginConfig.get('visibleOnSelector');
-    // const isVisible = visibleOnSelector(child);
+    const { child, config, offset } = this;
+    const visibleOnSelector = PluginConfig.getGlobal('visibleOnSelector')(child);
 
-    const camera = PluginConfig.get('camera');
-    const offsetX = PluginConfig.get('offsetX');
-    const offsetY = PluginConfig.get('barHeight') + PluginConfig.get('offsetY');
+    this.setAlpha(visibleOnSelector ? 1 : 0);
+
+    const totalOffset = offset * config.barHeight;
+    const camera = config.camera;
+    const offsetY = config.barHeight + totalOffset;
     const childBounds = child.getBounds();
     const x = (childBounds.x - camera.worldView.x) * camera.zoom;
     const y = (childBounds.y - camera.worldView.y) * camera.zoom;
 
-    this.setPosition(x - offsetX, y - offsetY);
+    this.setPosition(x, y - offsetY);
   }
 }
