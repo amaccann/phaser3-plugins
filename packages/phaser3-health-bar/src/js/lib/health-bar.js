@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
 import PluginConfig from './plugin-config';
 
-import ForegroundBar from './foreground-bar';
-import BackgroundBar from './background-bar';
+import BackgroundSprite from './background-sprite';
+import ForegroundSprite from './foreground-sprite';
 
 export default class HealthBar extends Phaser.GameObjects.Group {
   child;
@@ -12,8 +12,8 @@ export default class HealthBar extends Phaser.GameObjects.Group {
 
     this.child = child;
     PluginConfig.forEachConfig((config, index) => {
-      const background = new BackgroundBar(scene, child, config, index);
-      const foreground = new ForegroundBar(scene, child, config, index);
+      const background = new BackgroundSprite(scene, child, config, index);
+      const foreground = new ForegroundSprite(scene, child, config, index);
       this.add(background, true);
       this.add(foreground, true);
     });
@@ -31,7 +31,6 @@ export default class HealthBar extends Phaser.GameObjects.Group {
    * @description Destroy, and remove all children from the scene
    */
   destroy() {
-    console.log('destroy');
     super.destroy(true);
   }
 }
