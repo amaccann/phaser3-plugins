@@ -17,9 +17,9 @@ export default class HealthBarPlugin extends Phaser.Plugins.BasePlugin {
   healthBarScene;
   scene;
 
-  setup(scene, config = {}) {
+  setup(scene, globalConfig = {}, config = []) {
     this.scene = scene;
-    this.setConfig(config);
+    this.setConfig(globalConfig, config);
     this.createScene();
     this.setInitialCache();
     this.bindToDisplayList();
@@ -87,7 +87,7 @@ export default class HealthBarPlugin extends Phaser.Plugins.BasePlugin {
 
   addHealthBarToChild = child => {
     const { cache, healthBarScene } = this;
-    const isValidChild = PluginConfig.get('childSelector')(child);
+    const isValidChild = PluginConfig.getGlobal('childSelector')(child);
     const isAlreadyInCache = cache.has(child);
     if (isAlreadyInCache || !isValidChild) {
       return;
@@ -105,10 +105,11 @@ export default class HealthBarPlugin extends Phaser.Plugins.BasePlugin {
   /**
    * @method setConfig
    * @description Updates the plugin's configuration with new values
-   * @param {Object} config - new configuration object
+   * @param {Object} globalConfig - new configuration object
+   * @param {Array} config - Array of bars to configure
    */
-  setConfig(config = {}) {
-    PluginConfig.setConfig(config);
+  setConfig(globalConfig = {}, config = []) {
+    PluginConfig.setConfig(globalConfig, config);
   }
 
   setInitialCache() {

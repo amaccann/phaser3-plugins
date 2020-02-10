@@ -33,7 +33,7 @@ export default class DemoScene extends Scene {
     let sprite, setAsInteractive, spriteKey, y, worldX, worldY;
     this.mySprites = [];
     let x = 1;
-    const length = 5;
+    const length = 1;
     const OFFSET = 200;
 
     for (x; x <= length; x += 1) {
@@ -46,6 +46,11 @@ export default class DemoScene extends Scene {
         worldY = y * 100 + OFFSET;
         sprite = new Phaser.GameObjects.Sprite(this, worldX, worldY, spriteKey);
         this.physics.world.enable([sprite]);
+        sprite.shields = {
+          current: 25,
+          max: 50,
+          min: 0,
+        };
         sprite.health = 55;
         sprite.maxHealth = 100;
         sprite.minHealth = 0;
@@ -68,51 +73,83 @@ export default class DemoScene extends Scene {
     const { input, mySprites } = this;
     const { keyboard } = input;
 
-    // Test on killing a sprite
-    keyboard.on('keydown-R', () => {
+    // Test 'damaging' a sprite by a random amount of health
+    keyboard.on('keydown-H', () => {
       const randomIndex = Phaser.Math.Between(0, mySprites.length - 1);
       const sprite = mySprites[randomIndex];
+      if (!sprite) {
+        return;
+      }
+      const randomDamage = Phaser.Math.Between(8, 20);
+      sprite.health -= randomDamage;
+    });
+
+    // Test on killing a sprite
+    keyboard.on('keydown-R', () => {
+      const randomIndex = Phaser.Math.Between(0, this.mySprites.length - 1);
+      const sprite = this.mySprites[randomIndex];
 
       if (sprite) {
         sprite.destroy();
-        this.mySprites = mySprites.filter(s => s !== sprite);
+        this.mySprites = this.mySprites.filter(s => s !== sprite);
       }
+      console.log('this', this);
     });
   }
 
   preload() {
-    this.load.image('disabled-sprite', 'src/assets/disabled-sprite-50x50.png');
-    this.load.image('enabled-sprite', 'src/assets/enabled-sprite-50x50.png');
-    this.load.spritesheet('fullscreen', 'src/assets/fullscreen.png', { frameWidth: 64, frameHeight: 64 });
+    this.load.image('disabled-sprite', 'src/assets/demo/disabled-sprite-50x50.png');
+    this.load.image('enabled-sprite', 'src/assets/demo/enabled-sprite-50x50.png');
   }
 
   create() {
     this.createCamera();
     this.createSprites();
     this.setDemoKeyEvents();
+    const defaultBarConfig = {
+      barHeight: 15,
+      backgroundColor: 0x0019c7,
+      outlineColor: 0xffffff,
+      camera: this.cameras.main,
+      outlineWidth: 2,
+    };
 
     this.healthBarPlugin = this.plugins.start('HealthBarPlugin', 'healthBarPlugin');
-    this.healthBarPlugin.setup(this, {
-      barHeight: 15,
-      backgroundColor: 0xff00ff,
-      camera: this.cameras.main,
-      currentValueColor: 0x00ff00,
-      offsetY: 10,
-      outlineColor: 0xffffff,
-      outlineWidth: 2,
-      // childSelector: (child) => child.input?.enabled,
-      propToWatch: {
-        current: 'health',
-        max: 'maxHealth',
-        min: 'minHealth',
+    this.healthBarPlugin.setup(
+      this,
+      {
+        offsetY: 10,
+        // childSelector: (child) => child.input?.enabled,
+        visibleOnSelector: child => {
+          const { input } = this;
+          const { activePointer } = input;
+          const contains = child.getBounds().contains(activePointer.x, activePointer.y);
+
+          // If pointer overlaps with child, or other any other conditions you wish to display bar
+          return contains || child.isSelected;
+        },
       },
-      visibleOnSelector: child => {
-        const { input } = this;
-        const { activePointer } = input;
-        // If pointer overlaps with child, or other conditions
-        return child.isSelected || child.input?.enabled;
-      },
-    });
+      [
+        {
+          ...defaultBarConfig,
+          currentValueColor: 0x00ff00,
+          propsToWatch: {
+            current: 'health',
+            max: 'maxHealth',
+            min: 'minHealth',
+          },
+        },
+        {
+          ...defaultBarConfig,
+          currentValueColor: 0x00d9c7,
+          propsToWatch: {
+            current: 'shields.current',
+            max: 'shields.max',
+            min: 'shields.min',
+          },
+        },
+      ]
+    );
 
     this.fpsText = this.add.text(10, 10, '');
     this.fpsText.setScrollFactor(0);
