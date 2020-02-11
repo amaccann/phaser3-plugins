@@ -7,9 +7,12 @@ export default class ForegroundSprite extends BarSprite {
   constructor(scene, child, config, index) {
     super(scene, child, config, index);
 
-    const { currentValueColor, currentValueColorGradient } = config;
-    const gradiated = currentValueColor * currentValueColorGradient;
-    this.setTint(currentValueColor, currentValueColor, gradiated, gradiated);
+    const { currentValueColor } = config;
+    if (Array.isArray(currentValueColor)) {
+      this.setTint.apply(this, currentValueColor);
+    } else {
+      this.setTint(currentValueColor);
+    }
   }
 
   get childWidth() {

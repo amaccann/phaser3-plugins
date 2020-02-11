@@ -2,6 +2,9 @@ import Phaser, { Scene } from 'phaser';
 
 const { KeyCodes } = Phaser.Input.Keyboard;
 
+const DARK_BLUE = 0x0019c7;
+const GREEN = 0x00ff00;
+
 export default class DemoScene extends Scene {
   fpsText;
   mySprites;
@@ -108,8 +111,7 @@ export default class DemoScene extends Scene {
     this.setDemoKeyEvents();
     const defaultBarConfig = {
       barHeight: 15,
-      backgroundColor: 0x0019c7,
-      backgroundColorGradient: 0.8,
+      backgroundColor: [DARK_BLUE * 0.2, DARK_BLUE * 0.2, DARK_BLUE, DARK_BLUE],
       outlineColor: 0xffffff,
       camera: this.cameras.main,
       outlineWidth: 2,
@@ -133,8 +135,7 @@ export default class DemoScene extends Scene {
       [
         {
           ...defaultBarConfig,
-          currentValueColor: 0x00ff00,
-          currentValueColorGradient: 0.8,
+          currentValueColor: [GREEN, GREEN, GREEN * 0.8, GREEN * 0.8],
           propsToWatch: {
             current: 'health',
             max: 'maxHealth',
@@ -155,6 +156,9 @@ export default class DemoScene extends Scene {
 
     this.fpsText = this.add.text(10, 10, '');
     this.fpsText.setScrollFactor(0);
+
+    this.helpText = this.add.text(150, 10, 'Press [H] to "damage" a random Sprite; press [R] to kill a random Sprite');
+    this.helpText.setScrollFactor(0);
   }
 
   update(time, delta) {
