@@ -15,10 +15,13 @@ export default class HealthBarPlugin extends Phaser.Plugins.BasePlugin {
    */
   cache = new Set();
   healthBarScene;
-  scene;
 
-  setup(scene, globalConfig = {}, config = []) {
-    this.scene = scene;
+  /**
+   * @method setup
+   * @param {Object} globalConfig - Global configuration for the plugin
+   * @param {Array} config - Configuration array of the health-bars to create
+   */
+  setup(globalConfig = {}, config = []) {
     this.setConfig(globalConfig, config);
     this.createScene();
     this.setInitialCache();
@@ -36,6 +39,10 @@ export default class HealthBarPlugin extends Phaser.Plugins.BasePlugin {
 
   get displayList() {
     return this.scene.children;
+  }
+
+  get scene() {
+    return PluginConfig.getGlobal('scene');
   }
 
   get scenePlugin() {
