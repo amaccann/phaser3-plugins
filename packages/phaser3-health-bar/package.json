@@ -2,7 +2,7 @@
   "name": "@pixelburp/phaser3-health-bar",
   "version": "0.1.0",
   "description": "Phaser3 Mouse health bar",
-  "main": "dist/phaser3-health-bar.js",
+  "main": "dist/phaser3-health-bar-plugin.js",
   "repository": {
     "type": "git",
     "url": "git@github.com:amaccann/phaser3-plugins.git"

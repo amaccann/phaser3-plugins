@@ -6,7 +6,7 @@ import HealthBarScene, { SCENE_KEY } from './lib/health-bar-scene';
 /**
  * @class HealthBarPlugin
  * @extends Phaser.Plugins.BasePlugin
- * @description Phaser3, Drag Selection plugin
+ * @description Phaser3, Health Bar plugin
  */
 export default class HealthBarPlugin extends Phaser.Plugins.BasePlugin {
   /**
@@ -130,6 +130,5 @@ export default class HealthBarPlugin extends Phaser.Plugins.BasePlugin {
 
   // start() {
   //   super.start();
-  //   console.log('🤖 DragSelect Plugin started...');
   // }
 }
