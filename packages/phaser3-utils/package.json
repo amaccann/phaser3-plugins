@@ -9,7 +9,9 @@
   },
   "author": "Andrew MacCann <andrew.maccann@gmail.com>",
   "license": "MIT",
-  "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "webpack --config webpack/prod.js ",
     "lint": "prettier --write ./src/**/*.js",
