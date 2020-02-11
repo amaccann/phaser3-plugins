@@ -12,14 +12,9 @@ export default class HealthBarConfig {
   camera = null;
   /**
    * @name backgroundColor
-   * @type Number
+   * @type Number|Array
    */
   backgroundColor = 0x000000;
-  /**
-   * @name backgroundColorGradient
-   * @type Number
-   */
-  backgroundColorGradient = 0.8;
   /**
    * @name barHeight
    * @type Number
@@ -27,14 +22,9 @@ export default class HealthBarConfig {
   barHeight = 15;
   /**
    * @name currentValueColor
-   * @type Number
+   * @type Number|Array
    */
   currentValueColor = 0x33ff33;
-  /**
-   * @name currentValueColorGradient
-   * @type Number
-   */
-  currentValueColorGradient = 0.8;
   /**
    * @name outlineColor
    * @type Number

@@ -3,9 +3,12 @@ import BarSprite from './bar-sprite';
 export default class BackgroundSprite extends BarSprite {
   constructor(scene, child, config, index) {
     super(scene, child, config, index);
-    const { backgroundColor, backgroundColorGradient } = config;
-    const gradiated = backgroundColor * backgroundColorGradient;
+    const { backgroundColor } = config;
 
-    this.setTint(gradiated, gradiated, backgroundColor, backgroundColor);
+    if (Array.isArray(backgroundColor)) {
+      this.setTint.apply(this, backgroundColor);
+    } else {
+      this.setTint(backgroundColor);
+    }
   }
 }
