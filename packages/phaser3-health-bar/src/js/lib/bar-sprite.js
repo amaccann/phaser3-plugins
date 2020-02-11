@@ -35,8 +35,8 @@ export default class BarSprite extends Phaser.GameObjects.Sprite {
   }
 
   calculatePosition() {
-    const { child, config } = this;
-    const camera = config.camera;
+    const { child } = this;
+    const camera = PluginConfig.getGlobal('camera');
     const x = (child.x - camera.worldView.x) * camera.zoom;
     const y = (child.y - camera.worldView.y) * camera.zoom;
 

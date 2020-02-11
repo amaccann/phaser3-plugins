@@ -5,6 +5,11 @@ export const IS_VISIBLE = child => child.input?.enabled;
 
 export default class PluginGlobalConfig {
   /**
+   * @name camera
+   * @type Phaser.Cameras.Scene2D.Camera
+   */
+  camera = null;
+  /**
    * @name childSelector
    * @type Function
    */
@@ -19,6 +24,11 @@ export default class PluginGlobalConfig {
    * @type Number
    */
   offsetY = 15;
+  /**
+   * @name scene
+   * @type Phaser.Scene
+   */
+  scene = null;
   /**
    * @name visibleOnSelector
    * @type Function

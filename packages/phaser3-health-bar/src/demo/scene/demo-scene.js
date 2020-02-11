@@ -100,6 +100,31 @@ export default class DemoScene extends Scene {
     });
   }
 
+  getIsChildVisible = child => {
+    const { input } = this;
+    const camera = this.cameras.main;
+    const { activePointer } = input;
+    const childBounds = child.getBounds();
+    // const x = (activePointer.x - camera.worldView.x) * camera.zoom;
+    // const y = (activePointer.y - camera.worldView.y) * camera.zoom;
+
+    const x = (childBounds.x - camera.worldView.x) * camera.zoom;
+    const y = (childBounds.y - camera.worldView.y) * camera.zoom;
+    const width = childBounds.width * camera.zoom;
+    const height = childBounds.height * camera.zoom;
+
+    // console.log('x', x);
+    // console.log('y', y);
+    // console.log('bounds', child.getBounds());
+    const childRect = new Phaser.Geom.Rectangle(x, y, width, height);
+    const contains = childRect.contains(activePointer.x, activePointer.y);
+
+    // const contains = Phaser.Geom.Rectangle.Overlaps(rectangle, childRect);
+
+    // If pointer overlaps with child, or other any other conditions you wish to display bar
+    return contains || child.isSelected;
+  };
+
   preload() {
     this.load.image('disabled-sprite', 'src/assets/demo/disabled-sprite-50x50.png');
     this.load.image('enabled-sprite', 'src/assets/demo/enabled-sprite-50x50.png');
@@ -112,25 +137,16 @@ export default class DemoScene extends Scene {
     const defaultBarConfig = {
       barHeight: 15,
       backgroundColor: [DARK_BLUE * 0.2, DARK_BLUE * 0.2, DARK_BLUE, DARK_BLUE],
-      outlineColor: 0xffffff,
-      camera: this.cameras.main,
-      outlineWidth: 2,
     };
 
     this.healthBarPlugin = this.plugins.start('HealthBarPlugin', 'healthBarPlugin');
     this.healthBarPlugin.setup(
-      this,
       {
+        camera: this.cameras.main,
         offsetY: 10,
+        scene: this,
         // childSelector: (child) => child.input?.enabled,
-        visibleOnSelector: child => {
-          const { input } = this;
-          const { activePointer } = input;
-          const contains = child.getBounds().contains(activePointer.x, activePointer.y);
-
-          // If pointer overlaps with child, or other any other conditions you wish to display bar
-          return contains || child.isSelected;
-        },
+        visibleOnSelector: this.getIsChildVisible,
       },
       [
         {

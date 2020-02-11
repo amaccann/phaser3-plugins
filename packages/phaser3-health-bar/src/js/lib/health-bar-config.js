@@ -6,11 +6,6 @@ const DEFAULT_HEALTH_PROPS = {
 
 export default class HealthBarConfig {
   /**
-   * @name camera
-   * @type Phaser.Cameras.Scene2D.Camera
-   */
-  camera = null;
-  /**
    * @name backgroundColor
    * @type Number|Array
    */
@@ -25,16 +20,6 @@ export default class HealthBarConfig {
    * @type Number|Array
    */
   currentValueColor = 0x33ff33;
-  /**
-   * @name outlineColor
-   * @type Number
-   */
-  outlineColor = 0xffffff;
-  /**
-   * @name outlineWidth
-   * @type Number
-   */
-  outlineWidth = 2;
   /**
    * @name propsToWatch
    * @type Object

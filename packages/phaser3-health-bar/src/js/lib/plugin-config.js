@@ -5,8 +5,9 @@ class PluginConfig {
   config = {};
   data = [];
 
-  setConfig(config = {}, data = []) {
-    this.config = new PluginGlobalConfig(config);
+  setConfig(globalConfig = {}, data = []) {
+    console.log('globalConfig', globalConfig);
+    this.config = new PluginGlobalConfig(globalConfig);
     this.data = data.map(d => new HealthBarConfig(d));
   }
 
