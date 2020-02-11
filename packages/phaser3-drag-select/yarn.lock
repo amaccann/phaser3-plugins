@@ -740,6 +740,11 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
+"@pixelburp/phaser3-utils@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@pixelburp/phaser3-utils/-/phaser3-utils-0.0.5.tgz#5c8a9b671eb402869781fb4e434255ad2f52c3d3"
+  integrity sha512-zfdrbMicp0RQEgDeg1h+C6sN5EYFNJYUfi4LMuyKtl8s5PE/hjCayslrDo67SwqrslbW4SBMv0LHE+1SRQP9KA==
+
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@samverschueren/stream-to-observable/-/stream-to-observable-0.3.0.tgz#ecdf48d532c58ea477acfcab80348424f8d0662f"

@@ -7,7 +7,7 @@ const base = require('./base');
 const config = require('./config');
 
 module.exports = Object.assign(base, {
-  mode: 'production',
+  mode: 'development',
   devtool: 'source-map',
   entry: {
     plugin: `${config.SRC}/index.exports.js`,
@@ -25,6 +25,7 @@ module.exports = Object.assign(base, {
     maxAssetSize: 900000,
   },
   optimization: {
+    usedExports: true,
     minimizer: [
       new TerserPlugin({
         terserOptions: {

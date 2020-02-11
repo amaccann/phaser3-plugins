@@ -735,10 +735,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@pixelburp/phaser3-utils@^0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@pixelburp/phaser3-utils/-/phaser3-utils-0.0.4.tgz#7c7fc35004c14380ac341ec5a6b65a9d44c33b9e"
-  integrity sha512-dcv7BmFoWh5J/QcDfxDnziNKLsMaWaCNThEO0eyy/m8SATT1HpUMNSVeH3sxdQDDPJ4cvy+PZbyDte5f0XkKvA==
+"@pixelburp/phaser3-utils@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@pixelburp/phaser3-utils/-/phaser3-utils-0.0.5.tgz#5c8a9b671eb402869781fb4e434255ad2f52c3d3"
+  integrity sha512-zfdrbMicp0RQEgDeg1h+C6sN5EYFNJYUfi4LMuyKtl8s5PE/hjCayslrDo67SwqrslbW4SBMv0LHE+1SRQP9KA==
 
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.0"

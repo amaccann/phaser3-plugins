@@ -1,7 +1,7 @@
 import Phaser, { Scene } from 'phaser';
+import { forEach } from '@pixelburp/phaser3-utils';
 
 import DragSelectPlugin from 'src/js/drag-select-plugin';
-import { forEach } from 'src/js/util';
 
 const { KeyCodes } = Phaser.Input.Keyboard;
 
