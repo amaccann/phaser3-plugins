@@ -1,6 +1,6 @@
 {
   "name": "@pixelburp/phaser3-utils",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Useful tools and functions for plugins",
   "main": "dist/phaser3-utils.js",
   "repository": {
