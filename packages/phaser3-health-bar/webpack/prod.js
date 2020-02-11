@@ -26,6 +26,7 @@ module.exports = Object.assign(base, {
     maxAssetSize: 900000,
   },
   optimization: {
+    usedExports: true,
     minimizer: [
       new TerserPlugin({
         terserOptions: {

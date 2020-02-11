@@ -46,11 +46,5 @@ module.exports = Object.assign(base, {
       },
     ],
   },
-  plugins: [
-    new CleanWebpackPlugin(),
-    new webpack.DefinePlugin({
-      CANVAS_RENDERER: JSON.stringify(true),
-      WEBGL_RENDERER: JSON.stringify(true),
-    }),
-  ],
+  plugins: [new CleanWebpackPlugin()],
 });

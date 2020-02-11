@@ -1,5 +1,6 @@
+import { getFromChild } from '@pixelburp/phaser3-utils';
+// import { getFromChild } from '../../../../phaser3-utils/src/index.exports';
 import BarSprite from './bar-sprite';
-import getFromChild from '../util/get-from-child';
 
 const DEFAULT_WIDTH = 50;
 

@@ -1,8 +1,9 @@
 {
   "name": "@pixelburp/phaser3-utils",
+  "sideEffects": false,
   "version": "0.0.4",
   "description": "Useful tools and functions for plugins",
-  "main": "dist/phaser3-utils.js",
+  "main": "src/index.exports.js",
   "repository": {
     "type": "git",
     "url": "git@github.com:amaccann/phaser3-plugins.git"
