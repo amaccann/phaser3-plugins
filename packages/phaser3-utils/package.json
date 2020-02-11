@@ -1,0 +1,40 @@
+{
+  "name": "phaser3-utils",
+  "version": "0.0.1",
+  "description": "Useful tools and functions for plugins",
+  "main": "dist/phaser3-utils.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:amaccann/phaser3-plugins.git"
+  },
+  "author": "Andrew MacCann <andrew.maccann@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "webpack --config webpack/prod.js ",
+    "lint": "prettier --write ./src/**/*.js",
+    "watch": "npm-watch"
+  },
+  "engines": {
+    "node": ">=10"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
+  },
+  "devDependencies": {
+    "@babel/core": "^7.8.4",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-proposal-optional-chaining": "^7.8.3",
+    "@babel/preset-env": "^7.8.4",
+    "babel-loader": "^8.0.6",
+    "clean-webpack-plugin": "^3.0.0",
+    "husky": "^4.2.1",
+    "lint-staged": "^10.0.7",
+    "prettier": "^1.19.1",
+    "pretty-quick": "^2.0.1",
+    "webpack": "^4.41.6",
+    "webpack-cli": "^4.0.0-beta.2"
+  }
+}
