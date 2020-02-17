@@ -1,5 +1,7 @@
-import PluginConfig, { MOUSE_BUTTONS } from './plugin-config';
 import Phaser from 'phaser';
+import { MOUSE_BUTTONS } from '@pixelburp/phaser3-utils';
+
+import PluginConfig from './plugin-config';
 
 const EMPTY_VALUES = [undefined, null];
 

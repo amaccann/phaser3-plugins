@@ -1,6 +1,8 @@
-import PluginConfig, { MOUSE_BUTTONS } from './plugin-config';
-import MouseCameraDrag from './mouse-camera-drag';
 import Phaser from 'phaser';
+import { MOUSE_BUTTONS } from '@pixelburp/phaser3-utils';
+
+import PluginConfig from './plugin-config';
+import MouseCameraDrag from './mouse-camera-drag';
 
 const PREVENT_DEFAULT = e => e.preventDefault();
 
