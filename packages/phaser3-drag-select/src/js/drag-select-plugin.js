@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 
-import InterfaceScene, { SCENE_KEY } from './lib/interface-scene';
+import { INTERFACE_SCENE_KEY, createInterfaceScene } from '@pixelburp/phaser3-utils';
 import PluginConfig from './lib/plugin-config';
+import MouseInterface from './lib/mouse-interface';
 
 function doesSpriteOverlapWithSelection(child, rectangle) {
   const camera = PluginConfig.get('camera');
@@ -24,6 +25,7 @@ export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
   previewCache = [];
   selectionCache = [];
   interfaceScene;
+  mouseInterface;
   scene;
 
   /**
@@ -53,17 +55,13 @@ export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
 
   createInterfaceScene() {
     const scenePlugin = this.scenePlugin;
-    if (scenePlugin.get(SCENE_KEY)) {
-      return scenePlugin.launch(SCENE_KEY);
-    }
+    this.interfaceScene = createInterfaceScene(scenePlugin, this);
+    this.interfaceScene.enable();
 
-    scenePlugin.add(SCENE_KEY, InterfaceScene, true);
-    scenePlugin.bringToTop(SCENE_KEY);
-
-    this.interfaceScene = scenePlugin.get(SCENE_KEY);
-    if (this.interfaceScene) {
-      this.interfaceScene.setDragPlugin(this);
+    if (this.mouseInterface) {
+      this.mouseInterface.destroy();
     }
+    this.mouseInterface = new MouseInterface(this.interfaceScene, this);
   }
 
   getEachValidChildFromScene(rectangle) {
@@ -122,7 +120,7 @@ export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
 
   stop() {
     super.stop();
-    this.scenePlugin.stop(SCENE_KEY);
+    this.scenePlugin.stop(INTERFACE_SCENE_KEY);
   }
 
   start() {
