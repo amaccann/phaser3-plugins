@@ -110,9 +110,13 @@ export default class DemoScene extends Scene {
   };
 
   setSelectedSpritesText(sprites = []) {
-    const isPluginEnabled = this.dragSelect.isEnabled;
+    const { dragSelect, selectedSpritesText } = this;
+    const isPluginEnabled = dragSelect.isEnabled;
+    if (!selectedSpritesText.active) {
+      return;
+    }
 
-    this.selectedSpritesText.setText(`
+    selectedSpritesText.setText(`
 ${sprites.length} sprites selected
 Press [P] to enable/disable the plugin (enabled: ${isPluginEnabled})
 Press [R] to swap scenes

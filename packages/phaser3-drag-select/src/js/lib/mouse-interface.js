@@ -6,6 +6,7 @@ const PREVENT_DEFAULT = e => e.preventDefault();
 
 export default class MouseInterface extends Phaser.GameObjects.Graphics {
   cameraDrag;
+  dragPlugin;
   isDisabled = false;
   isDragging = false;
   isMouseDown = false;
@@ -14,19 +15,13 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
   end = new Phaser.Math.Vector2();
   rectangle = new Phaser.Geom.Rectangle();
 
-  constructor(scene) {
+  constructor(scene, dragPlugin) {
     super(scene);
 
     scene.add.existing(this);
     this.enableInputEvents();
     this.cameraDrag = new MouseCameraDrag(this);
-  }
-
-  /**
-   * @return InterfaceScene
-   */
-  get dragPlugin() {
-    return this.scene.dragPlugin;
+    this.dragPlugin = dragPlugin;
   }
 
   disable() {

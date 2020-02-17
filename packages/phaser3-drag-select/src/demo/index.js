@@ -22,6 +22,4 @@ const config = {
   scene: [DemoScene, DemoScene2],
 };
 
-const game = new Phaser.Game(config);
-
-console.warn('game', game);
+window.DEMO_GAME = new Phaser.Game(config);
