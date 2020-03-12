@@ -12,7 +12,7 @@ module.exports = Object.assign({}, defaultConfig, {
   output: {
     filename: '[name]-plugin.js',
     path: DIST_DIR,
-    library: 'phaser-navmesh-generation',
+    library: 'phaser3-navmesh-generation',
     libraryTarget: 'umd',
     umdNamedDefine: true
   },
