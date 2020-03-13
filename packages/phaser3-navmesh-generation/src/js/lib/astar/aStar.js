@@ -1,3 +1,5 @@
+import Phaser from 'phaser';
+
 import AStarPath from './aStarPath';
 import PriorityQueue from './priorityQueue';
 
@@ -15,8 +17,8 @@ export default class AStar {
   /**
    * @method search
    * @description Taken from http://jceipek.com/Olin-Coding-Tutorials/pathing.html
-   * @param {Phaser.Point} start
-   * @param {Phaser.Point} end
+   * @param {Phaser.Math.Point} start
+   * @param {Phaser.Math.Point} end
    * @returns {NavMeshPolygon[]|Boolean}
    */
   search(start, end) {

@@ -8,9 +8,9 @@ import Config from '../config';
 export default class DelaunayCluster {
   /**
    * @constructor
-   * @param {Phaser.Line[]} edges
-   * @param {Phaser.Line[]} parentEdges
-   * @param {Phaser.Line[]} allChildEdges
+   * @param {Line[]} edges
+   * @param {Line[]} parentEdges
+   * @param {Line[]} allChildEdges
    * @param {Object} options
    */
   constructor(edges = [], parentEdges = [], allChildEdges = [], options = {}) {
@@ -25,7 +25,7 @@ export default class DelaunayCluster {
   /**
    * @method addPoint
    * @description Adds new vertex point to Array. Returns index of newly pushed point, or existin
-   * @param {Phaser.Point} point
+   * @param {Phaser.Math.Vector2} point
    * @return {Number}
    */
   addPoint(point) {
@@ -44,9 +44,9 @@ export default class DelaunayCluster {
 
   /**
    * @method generate
-   * @param {Phaser.Line[]} polygonEdges
-   * @param {Phaser.Line[]} parentEdges
-   * @param {Phaser.Line[]} childClusterEdge
+   * @param {Line[]} polygonEdges
+   * @param {Line[]} parentEdges
+   * @param {Line[]} childClusterEdge
    */
   generate(polygonEdges, parentEdges, childClusterEdge) {
     const { edges, points, options } = this;

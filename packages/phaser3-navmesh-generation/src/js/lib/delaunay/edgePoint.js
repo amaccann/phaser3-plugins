@@ -1,8 +1,8 @@
 /**
  * @class EdgePoint
- * @extends Phaser.Point
+ * @extends Phaser.Math.Vector2
  */
-export default class EdgePoint extends Phaser.Point {
+export default class EdgePoint extends Phaser.Math.Vector2 {
   constructor(point) {
     super(point.x, point.y);
     this.sources = [point];
@@ -10,8 +10,8 @@ export default class EdgePoint extends Phaser.Point {
 
   /**
    * @method addSource
-   * @description Add a reference to a matching {Phaser.Point} object
-   * @param {Phaser.Point} point
+   * @description Add a reference to a matching {Phaser.Math.Vector2} object
+   * @param {Phaser.Math.Vector2} point
    */
   addSource(point) {
     this.sources.push(point);
@@ -19,7 +19,7 @@ export default class EdgePoint extends Phaser.Point {
 
   /**
    * @method updateSources
-   * @description Update all the source {Phaser.Point] instances that were originally matched to this.
+   * @description Update all the source {Phaser.Math.Vector2] instances that were originally matched to this.
    */
   updateSources() {
     const { sources, x, y } = this;

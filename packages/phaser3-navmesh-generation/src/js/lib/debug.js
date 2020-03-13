@@ -5,7 +5,7 @@ const types = [
   'polygonBounds'
 ];
 
-const DEBUG_DIAMETER = 10;
+const DEBUG_DIAMETER = 5;
 const DEBUG_COLOUR_YELLOW = 0xffff00;
 const DEBUG_COLOUR_RED = 0xC83E30;
 
@@ -13,6 +13,11 @@ const defaultOptions = {};
 types.forEach(type => defaultOptions[type] = false);
 
 class Debug {
+  /**
+   * @name gfr
+   * @type Phaser.GameObjects.Graphics
+   */
+  gfx;
   constructor(options = {}) {
     this.set(null, null, options);
   }
@@ -44,7 +49,7 @@ class Debug {
 
   /**
    * @method getWorldXY
-   * @param {Phaser.Point|Object} point
+   * @param {Phaser.Math.Vector2|Object} point
    */
   getWorldXY(point) {
     const { width, height } = this.tileDimensions;
@@ -83,10 +88,13 @@ class Debug {
      * @method Render the Delaunay triangles generated...
      */
     if (settings.navMesh) {
-      gfx.beginFill(0xff33ff, 0.6);
+      gfx.fillStyle(0xff33ff, 0.6);
       gfx.lineStyle(1, 0xffffff, 1);
-      polygons.forEach(poly => gfx.drawPolygon(poly.points));
-      gfx.endFill();
+      polygons.forEach(poly => {
+        gfx.fillPoints(poly.points);
+        gfx.strokePoints(poly.points);
+      });
+      // gfx.endFill();
     }
 
     /**
@@ -102,9 +110,9 @@ class Debug {
           gfx.lineTo(neighbour.centroid.x, neighbour.centroid.y);
         });
 
-        gfx.beginFill(0xffffff);
-        gfx.drawCircle(poly.centroid.x, poly.centroid.y, DEBUG_DIAMETER);
-        gfx.endFill();
+        gfx.fillStyle(0xffffff);
+        gfx.fillCircle(poly.centroid.x, poly.centroid.y, DEBUG_DIAMETER);
+        // gfx.endFill();
       });
     }
 
@@ -114,7 +122,7 @@ class Debug {
     if (settings.polygonBounds) {
       polygons.forEach(polygon => {
         gfx.lineStyle(2, DEBUG_COLOUR_YELLOW, 1);
-        gfx.drawCircle(polygon.centroid.x, polygon.centroid.y, polygon.boundsRadius * 2)
+        gfx.strokeCircle(polygon.centroid.x, polygon.centroid.y, polygon.boundsRadius * 2)
       });
       gfx.lineStyle(0, 0xffffff);
     }
@@ -124,23 +132,23 @@ class Debug {
    * @method initGraphics
    */
   initGraphics() {
-    const { game } = this;
+    const { scene } = this;
     if (!this.gfx) {
-      this.gfx = game.add.graphics(0, 0);
+      this.gfx = scene.add.graphics(0, 0);
     }
   }
 
   /**
    * @set
-   * @param {Phaser.Game} game
+   * @param {Phaser.Scene} scene
    * @param {Phaser.TilemapLayer} tileLayer
    * @param {Object} options
    */
-  set(game, tileLayer, options = {}) {
-    this.game = game;
+  set(scene, tileLayer, options = {}) {
+    this.scene = scene;
     this.tileLayer = tileLayer;
     this.settings = Object.assign({}, defaultOptions, options);
-    if (game) {
+    if (scene) {
       this.initGraphics();
     }
 

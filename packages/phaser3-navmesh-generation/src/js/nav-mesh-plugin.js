@@ -1,29 +1,25 @@
-import NavMesh, { defaultOptions } from './navMesh';
-import Config from './config';
-import Debug from './debug';
+import NavMesh, { defaultOptions } from './lib/navMesh';
+import Config from './lib/config';
+import Debug from './lib/debug';
 
 function err() {
   return console.error('[NavMeshPlugin] no TileMap / TileLayer found');
 }
 
-export default class NavMeshPlugin extends Phaser.Plugin {
-  constructor(game, manager) {
-    super(game, manager);
-  }
+export default class NavMeshPlugin extends Phaser.Plugins.BasePlugin {
+  navMesh;
 
   /**
    * @method buildFromTileLayer
-   * @param {Tilemap} tileMap
-   * @param {TilemapLayer} tileLayer
    * @param {Object} options
    */
-  buildFromTileLayer(tileMap, tileLayer, options = {}) {
-    if (!tileMap || !tileLayer) {
+  buildFromTileLayer(options = {}) {
+    if (!options.tileMap || !options.tileLayer) {
       return err();
     }
 
-    Config.set({ tileMap, tileLayer, ...options });
-    Debug.set(this.game, tileLayer, options.debug);
+    Config.set(options);
+    Debug.set(options.scene, options.tileLayer, options.debug);
 
     if (this.navMesh) {
       this.navMesh.generate();
@@ -32,6 +28,14 @@ export default class NavMeshPlugin extends Phaser.Plugin {
     }
 
     return this.navMesh;
+  }
+
+  getPath(startPosition, endPosition, offset) {
+    if (!this.navMesh) {
+      return false;
+    }
+
+    return this.navMesh.getPath(startPosition, endPosition, offset);
   }
 
   /**

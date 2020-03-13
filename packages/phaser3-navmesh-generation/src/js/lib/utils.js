@@ -1,5 +1,6 @@
 import EdgePoint from './delaunay/edgePoint';
 import Config from './config';
+import Line from './utils/line';
 
 const THREE_SIXTY_DEGREES = Math.PI * 2;
 
@@ -13,10 +14,6 @@ export function areLinesEqual(line1, line2) {
   const endEqual = line1End.equals(line2Start) || line1End.equals(line2End);
 
   return startEqual && endEqual;
-}
-
-export function getRandomColour() {
-  return Phaser.Color.HSLtoRGB(Math.random(), 1, 0.5).color;
 }
 
 /**
@@ -51,11 +48,11 @@ export function angleDifference(x, y) {
 export function sortLine(line) {
   const { start, end } = line;
   if (end.x < start.x) {
-    return new Phaser.Line(end.x, end.y, start.x, start.y);
+    return new Line(end.x, end.y, start.x, start.y);
   } else if (end.x > start.x) {
     return line;
   } else if (end.y < start.y) {
-    return new Phaser.Line(end.x, end.y, start.x, start.y);
+    return new Line(end.x, end.y, start.x, start.y);
   }
   return line;
 }
@@ -63,26 +60,26 @@ export function sortLine(line) {
 /**
  * @function getCrossProduct
  * @description Calculate the cross-product between a corner (3 points)
- * @param {Phaser.Point} point
- * @param {Phaser.Point} previous
- * @param {Phaser.Point} next
+ * @param {Phaser.Math.Vector2} point
+ * @param {Phaser.Math.Vector2} previous
+ * @param {Phaser.Math.Vector2} next
  */
 export function getCrossProduct(point, previous, next) {
-  const vector1 = Phaser.Point.subtract(point, previous);
-  const vector2 = Phaser.Point.subtract(point, next);
+  const vector1 = point.clone().subtract(previous);
+  const vector2 = point.clone().subtract(next);
   return vector1.cross(vector2);
 }
 
 /**
  * @method getDotProduct
  * @description Calculate the dot-product between a corner
- * @param {Phaser.Point} point
- * @param {Phaser.Point} previous
- * @param {Phaser.Point} next
+ * @param {Phaser.Math.Vector2} point
+ * @param {Phaser.Math.Vector2} previous
+ * @param {Phaser.Math.Vector2} next
  */
 export function getDotProduct(point, previous, next) {
-  const normal1 = Phaser.Point.subtract(previous, point).normalize();
-  const normal2 = Phaser.Point.subtract(next, point).normalize();
+  const normal1 = previous.clone().subtract(point).normalize();
+  const normal2 = next.clone().subtract(point).normalize();
   return normal1.dot(normal2);
 }
 
@@ -99,7 +96,7 @@ export function offsetFunnelPath(paths = [], inflateBy = 0) {
   }
 
   const inflated = [ paths[0].clone() ];
-  const offsetPoint = new Phaser.Point();
+  const offsetPoint = new Phaser.Math.Vector2();
   let i = 0;
   let nextCurrent;
   let previous;
@@ -123,7 +120,7 @@ export function offsetFunnelPath(paths = [], inflateBy = 0) {
       continue;
     }
 
-    nextCurrent = new Phaser.Line(current.x, current.y, next.x, next.y);
+    nextCurrent = new Line(current.x, current.y, next.x, next.y);
 
     cross = getCrossProduct(current, previous, next);
     dot = getDotProduct(current, previous, next);
@@ -132,7 +129,8 @@ export function offsetFunnelPath(paths = [], inflateBy = 0) {
 
     // Rotate the line segment between current & next points by half the vertex angle; then extend this segment
     // See: https://stackoverflow.com/questions/8292508/algorithm-for-extending-a-line-segment
-    const { start, end, length } = nextCurrent.clone().rotateAround(current.x, current.y, (angle / 2));
+    const rotated = Line.RotateAroundPointByAngle(Phaser.Geom.Line.Clone(nextCurrent), current, (angle / 2));
+    const { start, end, length } = rotated;
     offsetPoint.x = start.x + (start.x - end.x) / length * inflateBy;
     offsetPoint.y = start.y + (start.y - end.y) / length * inflateBy;
 
@@ -165,7 +163,7 @@ export function optimiseEdges(edges) {
     }
 
     const area = triarea2(line1.start, line1.end, line2.end);
-    line = new Phaser.Line(line1.start.x, line1.start.y, line2.end.x, line2.end.y);
+    line = new Line(line1.start.x, line1.start.y, line2.end.x, line2.end.y);
     if (!area) {
       edges.splice(i, 2, line);
       i--; // start again
@@ -177,7 +175,7 @@ export function optimiseEdges(edges) {
 
 /**
  * @method offsetPolygon
- * @param {Phaser.Point[]} points
+ * @param {Phaser.Math.Vector2[]} points
  * @param {Boolean} invert
  * @param {Cluster[]} clusters
  */
@@ -185,7 +183,7 @@ export function offsetPolygon(points = [], invert, clusters = []) {
   const { width, height } = Config.mapDimensions;
   const offsetBy = Config.get('offsetHullsBy') * (invert ? -1 : 1);
   const pointsLength = points.length;
-  const offsetPoint = new Phaser.Point();
+  const offsetPoint = new Phaser.Math.Vector2();
   let i = 0;
   let current;
   let previous;
@@ -201,7 +199,7 @@ export function offsetPolygon(points = [], invert, clusters = []) {
     previous = points[i === 0 ? pointsLength - 1 : i - 1];
     current = points[i];
     next = points[i === pointsLength - 1 ? 0 : i + 1];
-    nextCurrent = new Phaser.Line(current.x, current.y, next.x, next.y);
+    nextCurrent = new Line(current.x, current.y, next.x, next.y);
     area = triarea2(previous, current, next);
 
     dot = getDotProduct(current, previous, next);
@@ -213,7 +211,8 @@ export function offsetPolygon(points = [], invert, clusters = []) {
       continue;
     }
 
-    const { start, end, length } = nextCurrent.clone().rotateAround(current.x, current.y, (angle / 2));
+    const rotated = Line.RotateAroundPointByAngle(Phaser.Geom.Line.Clone(nextCurrent), current, (angle / 2));
+    const { start, end, length } = rotated;
 
     if (area < 0) {
       offsetPoint.x = start.x + (end.x - start.x) / length * offsetBy;
@@ -225,7 +224,7 @@ export function offsetPolygon(points = [], invert, clusters = []) {
 
     // Only update the edge point IF the new offset does NOT overlap with any sibling cluster
     if (!clusters.find(cluster => cluster.polygon.contains(offsetPoint.x, offsetPoint.y))) {
-      current.copyFrom(offsetPoint);
+      current.copy(offsetPoint);
     }
   }
 
@@ -234,7 +233,7 @@ export function offsetPolygon(points = [], invert, clusters = []) {
 
 /**
  * @method offsetEdges
- * @param {Phaser.Line[]} edges
+ * @param {Line[]} edges
  * @param {Boolean} invert
  * @param {Cluster[]} clusters
  */
