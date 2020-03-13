@@ -16,8 +16,8 @@ export default class Funnel {
 
   /**
    * @method add
-   * @param {Phaser.Point} left
-   * @param {Phaser.Point} right
+   * @param {Phaser.Math.Vector2} left
+   * @param {Phaser.Math.Vector2} right
    */
   add(left, right) {
     const { portals } = this;
@@ -27,7 +27,7 @@ export default class Funnel {
 
   /**
    * @method addPointToPath
-   * @param {Phaser.Point} portal
+   * @param {Phaser.Math.Vector2} portal
    * @param {Boolean} isNarrow
    */
   addPointToPath(portal, isNarrow = false) {
@@ -63,7 +63,7 @@ export default class Funnel {
     // Reset values and make current apex as ${portal}
     /**
      * @function setApexAndReset
-     * @param {Phaser.Point} point
+     * @param {Phaser.Math.Vector2} point
      * @param {Boolean} isNarrow
      * @param {Number} index
      */

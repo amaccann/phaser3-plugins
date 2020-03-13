@@ -1,6 +1,7 @@
 import MarchingSquares from './marchingSquares';
 import Cluster from './cluster';
 import Config from '../config';
+import Line from '../utils/line';
 
 /**
  * @class Hulls
@@ -37,10 +38,10 @@ export default class Hulls extends MarchingSquares {
     const w = width * tileWidth;
     const h = height * tileHeight;
     this.allEdges = [
-      new Phaser.Line(0, 0, w, 0),
-      new Phaser.Line(w, 0, w, h),
-      new Phaser.Line(w, h, 0, h),
-      new Phaser.Line(0, h, 0, 0)
+      new Line(0, 0, w, 0),
+      new Line(w, 0, w, h),
+      new Line(w, h, 0, h),
+      new Line(0, h, 0, 0)
     ];
 
     const parseCluster = ({ children, edges }) => {
@@ -61,7 +62,7 @@ export default class Hulls extends MarchingSquares {
     const { width, height } = Config.gridDimensions;
     let y = 0;
     let x;
-    const offsetPoint = new Phaser.Point();
+    const offsetPoint = new Phaser.Math.Vector2();
 
     for (y; y < height; y++) {
       x = 0;

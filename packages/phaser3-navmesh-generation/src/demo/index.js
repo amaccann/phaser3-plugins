@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 
-import DemoState from './demo-state';
+import DemoScene from './demo-scene';
+import NavMeshPlugin from '../js/nav-mesh-plugin';
 
 const config = {
   type: Phaser.AUTO,
@@ -8,7 +9,7 @@ const config = {
   height: 1000,
   parent: 'mycanvas',
   plugins: {
-    // global: [{ key: 'DragSelectPlugin', plugin: DragSelectPlugin }],
+    global: [{ key: 'NavMeshPlugin', plugin: NavMeshPlugin }],
   },
   physics: {
     default: 'arcade',
@@ -17,7 +18,7 @@ const config = {
       gravity: { y: 200 },
     },
   },
-  scene: [DemoState],
+  scene: [DemoScene],
 };
 
 window.DEMO_GAME = new Phaser.Game(config);

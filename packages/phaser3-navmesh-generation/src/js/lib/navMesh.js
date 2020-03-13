@@ -39,8 +39,8 @@ export default class NavMesh {
 
   /**
    * @method getPath
-   * @param {Phaser.Point} startPosition
-   * @param {Phaser.Point} endPosition
+   * @param {Phaser.Math.Vector2} startPosition
+   * @param {Phaser.Math.Vector2} endPosition
    * @param {Number} offset
    */
   getPath(startPosition, endPosition, offset) {

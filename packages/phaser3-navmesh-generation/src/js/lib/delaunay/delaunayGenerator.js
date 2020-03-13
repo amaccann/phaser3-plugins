@@ -3,6 +3,7 @@ import NavMeshPolygon from '../navMeshPolygon';
 import {areLinesEqual, offsetEdges, sortLine} from '../utils';
 import DelaunayCluster from './delaunayCluster';
 import Config from '../config';
+import Line from '../utils/line';
 
 /**
  * @class DelaunayGenerator
@@ -70,7 +71,7 @@ export default class DelaunayGenerator {
     /**
      * @method getOffsetChildEdges
      * @param {Cluster} cluster
-     * @return {Phaser.Line[]}
+     * @return {Line[]}
      */
     const getOffsetChildEdges = cluster => {
       const { children } = cluster;
@@ -115,10 +116,10 @@ export default class DelaunayGenerator {
     const { hulls } = this;
     const { width, height } = Config.mapDimensions;
     const parentEdges = [
-      new Phaser.Line(0, 0, width, 0),
-      new Phaser.Line(width, 0, width, height),
-      new Phaser.Line(width, height, 0, height),
-      new Phaser.Line(0, height, 0, 0)
+      new Line(0, 0, width, 0),
+      new Line(width, 0, width, height),
+      new Line(width, height, 0, height),
+      new Line(0, height, 0, 0)
     ];
     let edges = [];
 

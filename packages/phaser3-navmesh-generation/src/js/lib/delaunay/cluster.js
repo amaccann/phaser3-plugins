@@ -9,7 +9,7 @@ export default class Cluster extends MarchingSquares {
   constructor(contours, edges, invert = false) {
     super();
 
-    this.polygon = new Phaser.Polygon(contours);
+    this.polygon = new Phaser.Geom.Polygon(contours);
     this.edges = edges;
     this.invert = invert;
 
@@ -36,7 +36,7 @@ export default class Cluster extends MarchingSquares {
    * @method getStartingPoint
    */
   getStartingPoint() {
-    const offsetPoint = new Phaser.Point();
+    const offsetPoint = new Phaser.Math.Vector2();
     const { bounds } = this;
     const { x, y, width, height } = bounds;
 

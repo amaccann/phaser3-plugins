@@ -1,13 +1,17 @@
 import Phaser from 'phaser';
 
 import DemoTileMap from './tile-map';
+import PathLine from './path-line';
 
 const { KeyCodes } = Phaser.Input.Keyboard;
 
-export default class DemoState extends Phaser.Scene {
+export default class DemoScene extends Phaser.Scene {
   fpsText;
   mySprite;
   moveTo = null;
+  isLeftDown = false;
+  navMeshPlugin;
+  pathGraphics;
   rectangle;
   tileMap;
 
@@ -45,22 +49,28 @@ export default class DemoState extends Phaser.Scene {
     this.mySprite = this.add.sprite(200, 500, 'agent');
     this.physics.add.existing(this.mySprite);
     this.physics.add.collider(this.mySprite, this.tileMap.collisionLayer);
+
+    this.pathGraphics = new PathLine(this);
   }
 
+  onPointerDown = pointer => {
+    this.isLeftDown = pointer.buttons === 1;
+  };
+
   onPointerMove = pointer => {
-    if (!pointer.isDown) {
-      return false;
+    if (this.isLeftDown) {
+      this.placeTileAt(pointer);
     }
-    this.placeTileAt(pointer);
   };
 
   onPointerUp = pointer => {
-    const isRightClick = pointer.button === 2;
-    if (isRightClick) {
-      this.moveSpriteTo(pointer);
-    } else {
+    if (this.isLeftDown) {
       this.placeTileAt(pointer);
+      this.updateNavMesh();
+    } else {
+      this.moveSpriteTo(pointer);
     }
+    this.isLeftDown = false;
   };
 
   placeTileAt(pointer) {
@@ -72,6 +82,30 @@ export default class DemoState extends Phaser.Scene {
   moveSpriteTo(pointer) {
     const worldPoint = pointer.positionToCamera(this.cameras.main);
     this.moveTo = new Phaser.Math.Vector2(worldPoint.x, worldPoint.y);
+
+    const size = Math.max(this.mySprite.width, this.mySprite.height);
+    const position = new Phaser.Math.Vector2(this.mySprite.x, this.mySprite.y);
+    const path = this.navMeshPlugin.getPath(position, this.moveTo, size);
+    console.log('path', path);
+    this.pathGraphics.drawPath(path);
+  }
+
+  updateNavMesh() {
+    this.navMeshPlugin.buildFromTileLayer({
+      collisionIndices: this.tileMap.collisionIndices,
+      debug: {
+        hulls: false,
+        navMesh: true,
+        navMeshNodes: false,
+        polygonBounds: false,
+        aStarPath: false
+      },
+      midPointThreshold: 0,
+      scene: this,
+      tileMap: this.tileMap.map,
+      tileLayer: this.tileMap.collisionLayer,
+      timingInfo: true,
+    });
   }
 
   /**
@@ -86,15 +120,18 @@ export default class DemoState extends Phaser.Scene {
    * @method create
    */
   create() {
+    this.navMeshPlugin = this.plugins.start('NavMeshPlugin', 'navMeshPlugin');
+
+    this.input.on('pointerdown', this.onPointerDown);
     this.input.on('pointermove', this.onPointerMove);
     this.input.on('pointerup', this.onPointerUp);
     this.game.canvas.oncontextmenu = e => e.preventDefault();
 
     this.tileMap = new DemoTileMap(this);
 
-
     this.createCamera();
     this.createGameObjects();
+    this.updateNavMesh();
   }
 
   update(time, delta) {
