@@ -1,20 +1,23 @@
-import 'pixi';
-import 'p2';
-import 'phaser';
+import Phaser from 'phaser';
 
-import { Game } from 'phaser-ce';
-import DemoState from './demoState';
+import DemoState from './demo-state';
 
 const config = {
-  width: 800,
-  height: 600,
-  renderer: Phaser.AUTO,
-  parent: '',
-  transparent: false,
-  antialias: true,
-  physicsConfig: { arcade: true }
+  type: Phaser.AUTO,
+  width: 1600,
+  height: 1000,
+  parent: 'mycanvas',
+  plugins: {
+    // global: [{ key: 'DragSelectPlugin', plugin: DragSelectPlugin }],
+  },
+  physics: {
+    default: 'arcade',
+    arcade: {
+      // debug: DEBUG.ARCADE,
+      gravity: { y: 200 },
+    },
+  },
+  scene: [DemoState],
 };
 
-const game = new Game(config);
-game.state.add('demo', DemoState);
-game.state.start('demo');
+window.DEMO_GAME = new Phaser.Game(config);

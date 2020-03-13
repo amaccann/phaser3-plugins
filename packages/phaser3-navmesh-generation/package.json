@@ -12,10 +12,26 @@
     "access": "public"
   },
   "scripts": {
-    "build": "webpack --config webpack/build.config.js",
-    "deploy": "yarn build && yarn publish",
-    "watch": "webpack --watch",
-    "start": "webpack-dev-server --open --config webpack/dev.config.js"
+    "build": "webpack --config webpack/prod.js ",
+    "lint": "prettier --write ./src/**/*.js",
+    "start": "webpack-dev-server --config webpack/base.js --open",
+    "watch": "npm-watch"
+  },
+  "watch": {
+    "build": {
+      "patterns": [
+        "src",
+        "test"
+      ]
+    }
+  },
+  "engines": {
+    "node": ">=10"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
   },
   "peerDependencies": {
     "@babel/core": "^7.8.0",
