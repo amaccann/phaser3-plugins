@@ -1,5 +1,5 @@
-dist/
-public/*.bundle.js
-public/*.map
-.idea/
-node_modules/*
+.idea
+node_modules
+coverage
+dist
+yarn-error.log
