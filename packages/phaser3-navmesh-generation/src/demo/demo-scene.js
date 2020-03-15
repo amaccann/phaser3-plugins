@@ -125,6 +125,17 @@ export default class DemoScene extends Phaser.Scene {
     this.input.on('pointerdown', this.onPointerDown);
     this.input.on('pointermove', this.onPointerMove);
     this.input.on('pointerup', this.onPointerUp);
+    this.input.keyboard.on('keydown-Z', () => {
+      const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
+
+      this.navMeshPlugin.addSprite(worldPoint.x, worldPoint.y, 64, 32);
+    });
+    this.input.keyboard.on('keydown-X', () => {
+      const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
+
+      this.navMeshPlugin.removeSprite(worldPoint.x, worldPoint.y, 64, 32);
+    });
+
     this.game.canvas.oncontextmenu = e => e.preventDefault();
 
     this.tileMap = new DemoTileMap(this);

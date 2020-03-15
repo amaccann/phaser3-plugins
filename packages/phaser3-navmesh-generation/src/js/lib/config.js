@@ -1,6 +1,4 @@
-import MapGrid from './map/grid';
-
-const defaultConfig = {
+const DEFAULT_CONFIG = {
   collisionIndices: [],
   midPointThreshold: 0,
   offsetHullsBy: 0.1,
@@ -12,7 +10,7 @@ const defaultConfig = {
 
 class Config {
   constructor() {
-    this._c = {...defaultConfig};
+    this._c = {...DEFAULT_CONFIG};
   }
 
   /**
@@ -23,25 +21,29 @@ class Config {
     return this._c[key];
   }
 
-  get mapGrid() {
-    return MapGrid;
+  get tileLayer() {
+    return this._c.tileLayer;
+  }
+
+  get tileMap() {
+    return this._c.tileMap;
   }
 
   /**
    * @method getTileAt
    * @param {Number} x
    * @param {Number} y
-   * @return {MapTile}
+   * @return {Phaser.Tilemaps.Tile}
    */
   getTileAt(x, y) {
-    return MapGrid.getAt(x, y);
+    return this.tileLayer.getTileAt(x, y, true);
   }
 
   /**
    * @method gridDimensions
    */
   get gridDimensions() {
-    const { width, height } = MapGrid;
+    const { width, height } = this.tileMap;
     return { width, height };
   }
 
@@ -50,7 +52,7 @@ class Config {
    * @return {Object}
    */
   get mapDimensions() {
-    const { width, height, tileWidth, tileHeight, widthInPixels, heightInPixels } = this._c.tileMap;
+    const { width, height, tileWidth, tileHeight, widthInPixels, heightInPixels } = this.tileMap;
     return { width, height, tileWidth, tileHeight, widthInPixels, heightInPixels };
   }
 
@@ -58,9 +60,8 @@ class Config {
    * @method set
    * @param {Object} config
    */
-  set(config = defaultConfig) {
-    this._c = { ...defaultConfig, ...config };
-    MapGrid.copyFrom(config.tileLayer.layer.data);
+  set(config = DEFAULT_CONFIG) {
+    this._c = { ...DEFAULT_CONFIG, ...config };
   }
 }
 
