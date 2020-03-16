@@ -1,6 +1,6 @@
 {
   "name": "@pixelburp/phaser3-health-bar",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Phaser3 Mouse health bar",
   "main": "dist/phaser3-health-bar-plugin.js",
   "repository": {

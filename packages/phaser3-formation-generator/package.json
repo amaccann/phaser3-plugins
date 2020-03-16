@@ -1,6 +1,6 @@
 {
   "name": "phaser3-formation-generator",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Phaser 3 Plugin for controlling formation movement",
   "main": "dist/phaser3-drag-select-plugin.js",
   "repository": {
