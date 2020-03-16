@@ -7,7 +7,7 @@ const base = require('./base');
 const config = require('./config');
 
 module.exports = Object.assign(base, {
-  mode: 'development',
+  mode: 'production',
   devtool: 'source-map',
   entry: {
     plugin: `${config.SRC}/index.exports.js`,

@@ -1,1 +1,1 @@
-export { default as NavMeshPlugin } from './js/nav-mesh-plugin'
+export { default as NavMeshGenerationPlugin } from './js/nav-mesh-plugin'
