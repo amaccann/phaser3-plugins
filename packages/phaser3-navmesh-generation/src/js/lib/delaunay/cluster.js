@@ -1,3 +1,5 @@
+import { forEach } from '@pixelburp/phaser3-utils';
+
 import { optimiseEdges } from '../utils';
 import MarchingSquares from './marchingSquares';
 import Config from '../config';
@@ -6,6 +8,8 @@ import Config from '../config';
  * @class Cluster
  */
 export default class Cluster extends MarchingSquares {
+  bounds;
+
   constructor(contours, edges, invert = false) {
     super();
 
@@ -119,13 +123,13 @@ export default class Cluster extends MarchingSquares {
    * @method setBounds
    */
   setBounds() {
-    const [ first, ...rest ] = this.edges;
+    const [ first, ...restOfEdges ] = this.edges;
     let startingX = Math.min(first.start.x, first.end.x);
     let startingY = Math.min(first.start.y, first.end.y);
     let endX = Math.max(first.start.x, first.end.x);
     let endY = Math.max(first.start.y, first.end.y);
 
-    rest.forEach(edge => {
+    forEach(restOfEdges, edge => {
       const { start, end } = edge;
       const minX = Math.min(start.x, end.x);
       const minY = Math.min(start.y, end.y);

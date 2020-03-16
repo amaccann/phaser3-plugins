@@ -1,3 +1,5 @@
+import { forEach } from '@pixelburp/phaser3-utils';
+
 /**
  * @class EdgePoint
  * @extends Phaser.Math.Vector2
@@ -23,6 +25,6 @@ export default class EdgePoint extends Phaser.Math.Vector2 {
    */
   updateSources() {
     const { sources, x, y } = this;
-    sources.forEach(point => point.setTo(x, y));
+    forEach(sources, point => point.setTo(x, y));
   }
 }
