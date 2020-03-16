@@ -1,6 +1,6 @@
 {
   "name": "@pixelburp/phaser3-navmesh-generation",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "main": "dist/phaser3-navmesh-generation-plugin.js",
   "repository": {
     "type": "git",
