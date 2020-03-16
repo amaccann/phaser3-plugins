@@ -39,10 +39,13 @@ Then in your game's JS code:
 
 
 ```
-var navMesh = plugin.buildFromTileLayer(tileMap, tileLayer, {
+var navMesh = plugin.buildFromTileLayer({
   collisionIndices: [1, 2, 3],
   midPointThreshold: 0,
   useMidPoint: false,
+  scene: Phaser.Scene, 
+  tileMap: <Phaser.Tilemaps.Tilemap>,
+  tileLayer: <Phaser.Tilemaps.DynamicTilemapLayer|Phaser.Tilemaps.StaticTilemapLayer>,
   debug: {
     hulls: false,
     navMesh: false,
