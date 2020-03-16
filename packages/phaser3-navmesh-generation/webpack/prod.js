@@ -14,9 +14,9 @@ module.exports = Object.assign(base, {
   },
   externals: ['phaser'],
   output: {
-    filename: 'phaser3-drag-select-[name].js',
+    filename: 'phaser3-navmesh-generation-[name].js',
     path: config.DIST,
-    library: 'phaser3-drag-select',
+    library: 'phaser3-navmesh-generation',
     libraryTarget: 'umd',
     umdNamedDefine: true,
   },
