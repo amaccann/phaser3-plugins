@@ -1,3 +1,5 @@
+import { forEach } from '@pixelburp/phaser3-utils';
+
 import Hulls from './hulls';
 import NavMeshPolygon from '../navMeshPolygon';
 import {areLinesEqual, offsetEdges, sortLine} from '../utils';
@@ -77,7 +79,7 @@ export default class DelaunayGenerator {
       const { children } = cluster;
       let edges = [];
 
-      children.forEach(child =>  edges = edges.concat(offsetEdges(child.edges, false, cluster.children)));
+      forEach(children, child =>  edges = edges.concat(offsetEdges(child.edges, false, cluster.children)));
       return edges;
     };
 
@@ -88,16 +90,16 @@ export default class DelaunayGenerator {
     const parseCluster = cluster => {
       const clusterPolygons = [];
 
-      cluster.children.forEach(child => {
+      forEach(cluster.children, child => {
         const parentEdges = cluster.edges;
         const edges = offsetEdges(child.edges, true, child.children);
         const allChildEdges = getOffsetChildEdges(child);
         const { polygons } = new DelaunayCluster(edges, parentEdges, allChildEdges, options);
 
-        polygons.forEach(poly => clusterPolygons.push(new NavMeshPolygon(poly)));
+        forEach(polygons, poly => clusterPolygons.push(new NavMeshPolygon(poly)));
 
         if (child.children.length) {
-          child.children.forEach(parseCluster);
+          forEach(child.children, parseCluster);
         }
       });
 
@@ -105,7 +107,7 @@ export default class DelaunayGenerator {
       this.calculateClusterNeighbours(clusterPolygons);
     };
 
-    this.hulls.clusters.forEach(parseCluster);
+    forEach(this.hulls.clusters, parseCluster);
   }
 
   /**
@@ -124,10 +126,10 @@ export default class DelaunayGenerator {
     let edges = [];
 
     this.polygons = [];
-    hulls.clusters.forEach(cluster => edges = edges.concat(offsetEdges(cluster.edges, false, hulls.clusters)));
+    forEach(hulls.clusters, cluster => edges = edges.concat(offsetEdges(cluster.edges, false, hulls.clusters)));
 
     const { polygons } = new DelaunayCluster(edges, parentEdges, [], { interior: false });
-    polygons.forEach(p => this.polygons.push(new NavMeshPolygon(p)));
+    forEach(polygons, p => this.polygons.push(new NavMeshPolygon(p)));
     this.calculateClusterNeighbours(this.polygons);
   }
 }

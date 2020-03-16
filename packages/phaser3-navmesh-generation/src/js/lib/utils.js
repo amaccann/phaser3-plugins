@@ -1,3 +1,5 @@
+import { forEach } from '@pixelburp/phaser3-utils';
+
 import EdgePoint from './delaunay/edgePoint';
 import Config from './config';
 import Line from './utils/line';
@@ -129,7 +131,7 @@ export function offsetFunnelPath(paths = [], inflateBy = 0) {
 
     // Rotate the line segment between current & next points by half the vertex angle; then extend this segment
     // See: https://stackoverflow.com/questions/8292508/algorithm-for-extending-a-line-segment
-    const rotated = Line.RotateAroundPointByAngle(Phaser.Geom.Line.Clone(nextCurrent), current, (angle / 2));
+    const rotated = Line.RotateAroundPointByAngle(Phaser.Geom.Line.Clone(nextCurrent), current, (angle));
     const { start, end, length } = rotated;
     offsetPoint.x = start.x + (start.x - end.x) / length * inflateBy;
     offsetPoint.y = start.y + (start.y - end.y) / length * inflateBy;
@@ -259,7 +261,7 @@ export function offsetEdges(edges = [], invert = false, clusters = []) {
   }
 
   offsetPoints = offsetPolygon(allPoints, invert, clusters);
-  offsetPoints.forEach(point => point.updateSources());
+  forEach(offsetPoints, point => point.updateSources());
 
   return edges;
 }

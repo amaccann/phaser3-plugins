@@ -1,3 +1,4 @@
+import { forEach } from '@pixelburp/phaser3-utils';
 import cdt2d from 'cdt2d';
 import Config from '../config';
 
@@ -72,14 +73,14 @@ export default class DelaunayCluster {
       }
     };
 
-    parentEdges.forEach(addEdgeToPoints, this);
+    forEach(parentEdges, addEdgeToPoints, this);
 
-    childClusterEdge.forEach(edge => {
+    forEach(childClusterEdge, edge => {
       addEdgeToPoints(edge);
       addToEdges();
     });
 
-    polygonEdges.forEach(edge => {
+    forEach(polygonEdges, edge => {
       addEdgeToPoints(edge);
       addToEdges();
     });

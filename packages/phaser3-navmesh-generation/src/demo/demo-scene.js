@@ -101,6 +101,7 @@ export default class DemoScene extends Phaser.Scene {
         aStarPath: false
       },
       midPointThreshold: 0,
+      offsetHullsBy: 250,
       scene: this,
       tileMap: this.tileMap.map,
       tileLayer: this.tileMap.collisionLayer,

@@ -1,3 +1,5 @@
+import { forEach } from '@pixelburp/phaser3-utils';
+
 import MarchingSquares from './marchingSquares';
 import Cluster from './cluster';
 import Config from '../config';
@@ -49,17 +51,17 @@ export default class Hulls extends MarchingSquares {
         start: start.clone().multiply(tileWidth, tileHeight),
         end: end.clone().multiply(tileWidth, tileHeight)
       })));
-      children.forEach(parseCluster);
+      forEach(children, parseCluster);
     };
 
-    this.clusters.forEach(parseCluster);
+    forEach(this.clusters, parseCluster);
   }
 
   /**
    * @method getStartingPoint
    */
   getStartingPoint() {
-    const { width, height } = Config.gridDimensions;
+    const { width, height } = Config.mapDimensions;
     let y = 0;
     let x;
     const offsetPoint = new Phaser.Math.Vector2();
