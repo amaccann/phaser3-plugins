@@ -15,9 +15,9 @@ module.exports = Object.assign(base, {
   },
   externals: ['phaser'],
   output: {
-    filename: 'phaser3-gameobject-engine-[name].js',
+    filename: 'phaser3-game-object-engine-[name].js',
     path: config.DIST,
-    library: 'phaser3-gameobject-engine',
+    library: 'phaser3-game-object-engine',
     libraryTarget: 'umd',
     umdNamedDefine: true,
   },

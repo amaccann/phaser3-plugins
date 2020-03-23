@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
+import { DragSelectPlugin } from '@pixelburp/phaser3-drag-select';
 
-import GameObjectPlugin from '../js/gameobject-plugin';
+import GameObjectEnginePlugin from '../js/game-object-engine-plugin';
 import DemoScene from './scene/demo-scene';
 
 const config = {
@@ -9,7 +10,10 @@ const config = {
   height: 1000,
   parent: 'mycanvas',
   plugins: {
-    global: [{ key: 'GameObjectPlugin', plugin: GameObjectPlugin }],
+    global: [
+      { key: 'GameObjectEnginePlugin', plugin: GameObjectEnginePlugin },
+      { key: 'DragSelectPlugin', plugin: DragSelectPlugin },
+    ],
   },
   physics: {
     default: 'arcade',

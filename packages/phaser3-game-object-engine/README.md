@@ -1,4 +1,4 @@
-# `phaser3-gameobject-engine`
+# `phaser3-game-object-engine`
 
 > TODO: description
 
