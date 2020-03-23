@@ -1,14 +1,67 @@
 import Phaser, { Scene } from 'phaser';
+import { forEach } from '@pixelburp/phaser3-utils';
+import DemoSprite from '../sprite/demo-sprite';
 
 const { KeyCodes } = Phaser.Input.Keyboard;
+const TINT_PREVIEW = 0x00ff00;
+const TINT_SELECTION = 0xff00ff;
 
 export default class DemoScene extends Scene {
   fpsText;
+  gameObjectEnginePlugin;
   mySprites;
+
+  selectedSprites = [];
 
   constructor() {
     super({ key: 'DemoScene', active: true });
   }
+
+  onPreview = ({ items }) => {
+    forEach(this.children.getChildren(), sprite => {
+      // Ignore if already selected...
+      if (sprite.tintTopLeft === TINT_SELECTION) {
+        return;
+      }
+
+      // If one of the sprites under the selection, set tint
+      if (items.includes(sprite)) {
+        return sprite.setTint(TINT_PREVIEW);
+      }
+
+      // Otherwise, clear it.
+      sprite.setTint(0xffffff);
+    });
+
+    // sprites.forEach(sprite => sprite.setTint(0x00ff00));
+  };
+
+  onSelect = ({ items }) => {
+    console.warn('items', items);
+
+    this.children.getChildren().forEach(s => s.setTint(0xffffff));
+
+    items.forEach(sprite => sprite.setTint(0xff00ff));
+    this.selectedSprites = items;
+  };
+
+  bindMouseEvents = () => {
+    const { cameras } = this;
+
+    this.input.on('pointerup', (pointer) => {
+      const { shiftKey } = pointer.event;
+      console.log('pointer', pointer);
+      console.log('shiftKey', shiftKey);
+      if (!this.selectedSprites.length || pointer.button !== 2) {
+        return;
+      }
+
+      const worldPoint = pointer.positionToCamera(cameras.main);
+      forEach(this.selectedSprites, sprite => {
+        sprite.pxlEngine.addWayPoint(worldPoint, shiftKey);
+      });
+    });
+  };
 
   createCamera() {
     const { keyboard } = this.input;
@@ -29,8 +82,22 @@ export default class DemoScene extends Scene {
     this.myControls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
   }
 
+  createDragSelect() {
+    this.dragSelect = this.plugins.start('DragSelectPlugin', 'dragSelect');
+    this.dragSelect.setup(this, {
+      camera: this.cameras.main,
+      onPreview: this.onPreview,
+      onSelect: this.onSelect,
+      outlineColor: 0x00ff00,
+      outlineWidth: 2,
+      rectBgColor: 0x33ff00,
+      rectAlpha: 0.2,
+    });
+
+  }
+
   createSprites() {
-    let sprite, setAsInteractive, y, worldX, worldY;
+    let sprite, y, worldX, worldY;
     this.mySprites = [];
     let x = 1;
     const length = 5;
@@ -40,20 +107,14 @@ export default class DemoScene extends Scene {
       y = 1;
       for (y; y <= length; y += 1) {
         // Every even numbered item will be set as "interactive"
-        setAsInteractive = x % 2 === 0;
         worldX = x * 100 + OFFSET;
         worldY = y * 100 + OFFSET;
-        sprite = new Phaser.GameObjects.Sprite(this, worldX, worldY, 'enabled-sprite');
-        this.physics.world.enable([sprite]);
-
-        if (setAsInteractive) {
-          sprite.setInteractive();
-        }
-
-        this.add.existing(sprite);
+        sprite = new DemoSprite(this, worldX, worldY);
         this.mySprites.push(sprite);
       }
     }
+
+    this.physics.world.enable(this.mySprites);
   }
 
   setDemoKeyEvents() {
@@ -84,42 +145,18 @@ export default class DemoScene extends Scene {
     });
   }
 
-  getIsChildVisible = child => {
-    const { input } = this;
-    const camera = this.cameras.main;
-    const { activePointer } = input;
-    const childBounds = child.getBounds();
-    // const x = (activePointer.x - camera.worldView.x) * camera.zoom;
-    // const y = (activePointer.y - camera.worldView.y) * camera.zoom;
-
-    const x = (childBounds.x - camera.worldView.x) * camera.zoom;
-    const y = (childBounds.y - camera.worldView.y) * camera.zoom;
-    const width = childBounds.width * camera.zoom;
-    const height = childBounds.height * camera.zoom;
-
-    // console.log('x', x);
-    // console.log('y', y);
-    // console.log('bounds', child.getBounds());
-    const childRect = new Phaser.Geom.Rectangle(x, y, width, height);
-    const contains = childRect.contains(activePointer.x, activePointer.y);
-
-    // const contains = Phaser.Geom.Rectangle.Overlaps(rectangle, childRect);
-
-    // If pointer overlaps with child, or other any other conditions you wish to display bar
-    return contains || child.isSelected;
-  };
-
   preload() {
     this.load.image('enabled-sprite', 'src/assets/demo/enabled-sprite-50x50.png');
   }
 
   create() {
+    this.gameObjectEnginePlugin = this.plugins.start('GameObjectEnginePlugin', 'gameObjectEnginePlugin');
+
+    this.createDragSelect();
+    this.bindMouseEvents();
     this.createCamera();
     this.createSprites();
     this.setDemoKeyEvents();
-
-    this.gameObjectPlugin = this.plugins.start('GameObjectPlugin', 'gameObjectPlugin');
-
 
     this.fpsText = this.add.text(10, 10, '');
     this.fpsText.setScrollFactor(0);
@@ -127,6 +164,7 @@ export default class DemoScene extends Scene {
 
   update(time, delta) {
     this.myControls.update(time, delta);
+    this.gameObjectEnginePlugin.update(time, delta);
     // this.physics.world.collide(this.mySprites);
 
     this.fpsText.setText(`FPS: ${this.game.loop.actualFps.toFixed(3)}`);
