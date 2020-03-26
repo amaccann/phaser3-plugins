@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-import { INTERFACE_SCENE_KEY, createInterfaceScene } from '@pixelburp/phaser3-utils';
+import { INTERFACE_SCENE_KEY, createUtilityScene } from '@pixelburp/phaser3-utils';
 import PluginConfig from './lib/plugin-config';
 import MouseInterface from './lib/mouse-interface';
 
@@ -55,7 +55,7 @@ export default class DragSelectPlugin extends Phaser.Plugins.BasePlugin {
 
   createInterfaceScene() {
     const scenePlugin = this.scenePlugin;
-    this.interfaceScene = createInterfaceScene(scenePlugin, this);
+    this.interfaceScene = createUtilityScene(INTERFACE_SCENE_KEY, scenePlugin, this);
     this.interfaceScene.enable();
 
     if (this.mouseInterface) {
