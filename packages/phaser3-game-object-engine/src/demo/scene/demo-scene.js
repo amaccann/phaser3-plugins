@@ -30,7 +30,9 @@ export default class DemoScene extends Scene {
       }
 
       // Otherwise, clear it.
-      sprite.setTint(0xffffff);
+      if (!!sprite.input) {
+        sprite.setTint(0xffffff);
+      }
     });
 
     // sprites.forEach(sprite => sprite.setTint(0x00ff00));
@@ -39,7 +41,7 @@ export default class DemoScene extends Scene {
   onSelect = ({ items }) => {
     console.warn('items', items);
 
-    this.children.getChildren().forEach(s => s.setTint(0xffffff));
+    this.children.getChildren().forEach(s => s.input && s.setTint(0xffffff));
 
     items.forEach(sprite => sprite.setTint(0xff00ff));
     this.selectedSprites = items;

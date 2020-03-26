@@ -2,7 +2,9 @@ import Phaser from 'phaser';
 
 import { isStaticType, setGameObjectRadius } from './utils';
 import WayPoint from './way-point';
+import { GameObjectRadar } from './game-object-radar';
 
+const APPROACHING_SPEED = 60;
 const STOPPING_THRESHOLD = 5;
 const DEFAULT_CONFIG = {
   speed: 240,
@@ -12,19 +14,20 @@ const DEFAULT_CONFIG = {
 /**
  * @class GameObjectEngine
  */
-export class GameObjectEngine extends Phaser.GameObjects.Group {
+export class GameObjectEngine {
   config;
   gameObject;
   gameObjectRadius;
   isPaused = false;
+  plugin;
   scene;
   wayPoints = [];
 
   /**
    * @constructor
    */
-  constructor(gameObject, config = {}) {
-    super(gameObject.scene, { runChildUpdate: true });
+  constructor(gameObject, plugin, config = {}) {
+    // super(plugin.gpsScene, { runChildUpdate: true });
 
     this.config = {
       ...DEFAULT_CONFIG,
@@ -34,7 +37,10 @@ export class GameObjectEngine extends Phaser.GameObjects.Group {
     this.gameObjectRadius = setGameObjectRadius(gameObject);
     this.gameObject.addWayPoint = this.addWayPoint;
     this.gameObject.removeWayPoint = this.removeWayPoint;
-    this.scene = gameObject.scene;
+    this.plugin = plugin;
+    this.scene = plugin.gpsScene;
+
+    this.radar = new GameObjectRadar(this, plugin);
   }
 
   getCurrentWayPoint() {
@@ -90,14 +96,12 @@ export class GameObjectEngine extends Phaser.GameObjects.Group {
   }
 
   slowOnApproachToWayPoint() {
-    const { gameObject } = this;
     const currentWayPoint = this.getCurrentWayPoint();
     if (!currentWayPoint) {
       return;
     }
 
-    const angle = Math.atan2(currentWayPoint.y - gameObject.y, currentWayPoint.x - gameObject.x);
-    gameObject.body.velocity.setToPolar(angle, 60);
+    this.updateVelocity(currentWayPoint, true);
   }
 
   stop() {
@@ -105,28 +109,56 @@ export class GameObjectEngine extends Phaser.GameObjects.Group {
     gameObject.body.reset(gameObject.x, gameObject.y)
   }
 
-  update() {
-    const { config, gameObject } = this;
+  updateVelocity(currentWayPoint, isApproaching) {
+    const { config, gameObject, radar } = this;
+    const { avoidance, alignment, cohesion } = radar;
+
+    // If we're approach the current way-point, don't worry about flocking. Just slow up.
+    if (isApproaching) {
+      const angle = Math.atan2(currentWayPoint.y - gameObject.y, currentWayPoint.x - gameObject.x);
+      return gameObject.body.velocity.setToPolar(angle, APPROACHING_SPEED);
+    }
+
+    const newVelocity = new Phaser.Math.Vector2(currentWayPoint).subtract(gameObject).normalize().scale(config.speed);
+
+    newVelocity.add(avoidance);
+    newVelocity.add(alignment);
+    newVelocity.add(cohesion);
+
+    gameObject.body.velocity.copy(newVelocity).normalize().scale(config.speed);
+  }
+
+  update(time, delta) {
+    const { config, gameObject, radar } = this;
     const currentWayPoint = this.getCurrentWayPoint();
 
+    // Update the radar that figures out neighbours and "flocking" logic.
+    radar.update();
+
+    // No way point? Just stop.
     if (!currentWayPoint) {
+      radar.resetAdjustments();
       return this.stop();
     }
 
+    // Get the distance between you and the current way point.
     const distance = Phaser.Math.Distance.Between(gameObject.x, gameObject.y, currentWayPoint.x, currentWayPoint.y);
-
     // If distance is less than the "radius" of GameObject's size
-    if (distance <= this.gameObjectRadius) {
+    const isApproaching = distance <= this.gameObjectRadius;
+
+    if (isApproaching) {
       this.slowOnApproachToWayPoint(); // Slow approach to help accuracy.
 
       if (distance <= config.stoppingThreshold) {
         this.stop();
         this.removeWayPoint(currentWayPoint);
       }
-    } else if (!currentWayPoint.isStaticLocation) {
+    // } else if (!currentWayPoint.isStaticLocation) {
       // Only re-calculate the velocity if this is a "dynamic" way-point (like a GameObject)
-      const angle = Math.atan2(currentWayPoint.y - gameObject.y, currentWayPoint.x - gameObject.x);
-      gameObject.body.velocity.setToPolar(angle, config.speed);
+      // const angle = Math.atan2(currentWayPoint.y - gameObject.y, currentWayPoint.x - gameObject.x);
+      // gameObject.body.velocity.setToPolar(angle, config.speed);
+    } else {
+      this.updateVelocity(currentWayPoint);
     }
   }
 }

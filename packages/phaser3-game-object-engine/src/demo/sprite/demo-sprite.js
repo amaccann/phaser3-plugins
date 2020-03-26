@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-const TEMP_SPEED = 400;
+const TEMP_SPEED = 250;
 
 export default class DemoSprite extends Phaser.GameObjects.Sprite {
   constructor(scene, x, y) {
@@ -10,9 +10,5 @@ export default class DemoSprite extends Phaser.GameObjects.Sprite {
     });
     scene.add.existing(this);
     this.setInteractive();
-  }
-
-  update(time, delta) {
-    console.log('time', time);
   }
 }
