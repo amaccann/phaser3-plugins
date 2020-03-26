@@ -151,6 +151,7 @@ export default class DemoScene extends Scene {
 
   create() {
     this.gameObjectEnginePlugin = this.plugins.start('GameObjectEnginePlugin', 'gameObjectEnginePlugin');
+    this.gameObjectEnginePlugin.setup(this, this.cameras.main);
 
     this.createDragSelect();
     this.bindMouseEvents();
