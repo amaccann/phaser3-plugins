@@ -8,7 +8,8 @@ const APPROACHING_SPEED = 60;
 const STOPPING_THRESHOLD = 5;
 const DEFAULT_CONFIG = {
   speed: 240,
-  stoppingThreshold: STOPPING_THRESHOLD,
+  gameObjectStoppingDistance: STOPPING_THRESHOLD,
+  stoppingDistance: STOPPING_THRESHOLD,
 };
 
 /**
@@ -27,8 +28,6 @@ export class GameObjectEngine {
    * @constructor
    */
   constructor(gameObject, plugin, config = {}) {
-    // super(plugin.gpsScene, { runChildUpdate: true });
-
     this.config = {
       ...DEFAULT_CONFIG,
       ...config
@@ -43,20 +42,34 @@ export class GameObjectEngine {
     this.radar = new GameObjectRadar(this, plugin);
   }
 
+  get body() {
+    return this.gameObject?.body;
+  }
+
+  get velocity() {
+    return this.body?.velocity;
+  }
+
+  /**
+   * @description Is any way-point marked as a "shuffle" out of the way?
+   */
+  get isShuffling() {
+    return this.wayPoints.some(wp => wp.isShuffle);
+  }
+
   getCurrentWayPoint() {
     return (this.wayPoints || [])[0];
   }
 
-  addWayPoint = (item) => {
-    // if (this.wayPoints.includes(item)) {
-    //   return;
-    // }
+  addWayPoint = (item, isShuffle) => {
+    const wayPoint = new WayPoint(item, isShuffle);
+    // this.wayPoints.push(wayPoint);
+    this.wayPoints = [wayPoint];
+  };
 
-    const wayPoint = new WayPoint(item);
-    this.wayPoints.push(wayPoint);
-    if (wayPoint.isStaticLocation) {
-      this.setStaticVelocity();
-    }
+  unshiftWayPoint = (item, isShuffle) => {
+    const wayPoint = new WayPoint(item, isShuffle);
+    this.wayPoints.unshift(wayPoint);
   };
 
   removeWayPoint = wayPoint => {
@@ -66,13 +79,18 @@ export class GameObjectEngine {
     if (!this.wayPoints || !this.wayPoints.length) {
       return this.stop();
     }
-
-    // If there's another way-point, check if it's static
-    const currentWayPoint = this.getCurrentWayPoint();
-    if (currentWayPoint && currentWayPoint.isStaticLocation) {
-      this.setStaticVelocity();
-    }
   };
+
+  shuffle(shuffleTo) {
+    if (this.isShuffling) {
+      return;
+    }
+
+    const originalLocation = new Phaser.Math.Vector2(this.gameObject.x, this.gameObject.y);
+
+    this.unshiftWayPoint(originalLocation, true);
+    this.unshiftWayPoint(shuffleTo, true);
+  }
 
   pause() {
     this.isPaused = true;
@@ -87,14 +105,6 @@ export class GameObjectEngine {
     this.wayPoints = [];
   }
 
-  setStaticVelocity() {
-    const { config, gameObject } = this;
-    const currentWayPoint = this.getCurrentWayPoint();
-    if (currentWayPoint) {
-      this.scene.physics.moveToObject(gameObject, currentWayPoint, config.speed);
-    }
-  }
-
   slowOnApproachToWayPoint() {
     const currentWayPoint = this.getCurrentWayPoint();
     if (!currentWayPoint) {
@@ -106,7 +116,9 @@ export class GameObjectEngine {
 
   stop() {
     const { gameObject } = this;
-    gameObject.body.reset(gameObject.x, gameObject.y)
+    if (gameObject.body) {
+      gameObject.body.reset(gameObject.x, gameObject.y)
+    }
   }
 
   updateVelocity(currentWayPoint, isApproaching) {
@@ -129,8 +141,13 @@ export class GameObjectEngine {
   }
 
   update(time, delta) {
-    const { config, gameObject, radar } = this;
+    const { config, gameObject, isPaused, radar } = this;
     const currentWayPoint = this.getCurrentWayPoint();
+
+    // If paused, do nothing
+    if (isPaused) {
+      return this.stop();
+    }
 
     // Update the radar that figures out neighbours and "flocking" logic.
     radar.update();
@@ -143,22 +160,24 @@ export class GameObjectEngine {
 
     // Get the distance between you and the current way point.
     const distance = Phaser.Math.Distance.Between(gameObject.x, gameObject.y, currentWayPoint.x, currentWayPoint.y);
-    // If distance is less than the "radius" of GameObject's size
-    const isApproaching = distance <= this.gameObjectRadius;
+    const stoppingDistance = currentWayPoint.isStaticLocation ? config.stoppingDistance : config.gameObjectStoppingDistance;
+    // If distance is less than the "radius" of GameObject's size or GameObject stopping threshold
+    const isApproaching = distance <= (currentWayPoint.isStaticLocation ? this.gameObjectRadius : config.gameObjectStoppingDistance);
 
-    if (isApproaching) {
-      this.slowOnApproachToWayPoint(); // Slow approach to help accuracy.
+    if (!isApproaching) {
+      return this.updateVelocity(currentWayPoint);
+    }
 
-      if (distance <= config.stoppingThreshold) {
-        this.stop();
+    this.slowOnApproachToWayPoint(); // Slow approach to help accuracy.
+
+    if (distance <= stoppingDistance) {
+      this.stop();
+
+      // If this is just a static point on the map, remove the waypoint, we're done.
+      if (currentWayPoint.isStaticLocation) {
         this.removeWayPoint(currentWayPoint);
       }
-    // } else if (!currentWayPoint.isStaticLocation) {
-      // Only re-calculate the velocity if this is a "dynamic" way-point (like a GameObject)
-      // const angle = Math.atan2(currentWayPoint.y - gameObject.y, currentWayPoint.x - gameObject.x);
-      // gameObject.body.velocity.setToPolar(angle, config.speed);
-    } else {
-      this.updateVelocity(currentWayPoint);
     }
+
   }
 }

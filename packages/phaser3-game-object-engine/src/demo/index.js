@@ -19,7 +19,7 @@ const config = {
     default: 'arcade',
     arcade: {
       debug: true,
-      gravity: { x: 0, y: 0 },
+      gravity: { y: 200 },
     },
   },
   scene: [DemoScene],
