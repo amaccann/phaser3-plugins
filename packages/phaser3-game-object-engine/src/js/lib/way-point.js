@@ -1,10 +1,12 @@
 import { isStaticType } from './utils';
 
 export default class WayPoint {
+  isShuffle = false;
   isStaticLocation;
   item;
 
-  constructor(item) {
+  constructor(item, isShuffle = false) {
+    this.isShuffle = isShuffle;
     this.isStaticLocation = isStaticType(item);
     this.item = item;
   }
