@@ -16,7 +16,7 @@ const DEFAULT_CONFIG = {
  * @class GameObjectEngine
  */
 export class GameObjectEngine {
-  config;
+  config = DEFAULT_CONFIG;
   gameObject;
   gameObjectRadius;
   isPaused = false;
@@ -28,10 +28,7 @@ export class GameObjectEngine {
    * @constructor
    */
   constructor(gameObject, plugin, config = {}) {
-    this.config = {
-      ...DEFAULT_CONFIG,
-      ...config
-    };
+    this.setConfig(config);
     this.gameObject = gameObject;
     this.gameObjectRadius = setGameObjectRadius(gameObject);
     this.gameObject.addWayPoint = this.addWayPoint;
@@ -103,6 +100,14 @@ export class GameObjectEngine {
   clearAll() {
     this.stop();
     this.wayPoints = [];
+  }
+
+  setConfig(config = DEFAULT_CONFIG) {
+    this.config = {
+      ...this.config,
+      ...config
+    };
+    console.log('this', this.config);
   }
 
   slowOnApproachToWayPoint() {
