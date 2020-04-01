@@ -4,11 +4,18 @@ import { isStaticType, setGameObjectRadius } from './utils';
 import WayPoint from './way-point';
 import { GameObjectRadar } from './game-object-radar';
 
+const NINETY_DEGREES_IN_RADIANS = Math.PI / 2;
+const THREE_SIXTY_DEGREES_IN_RADIANS = Math.PI * 2;
+const ANTI_CLOCKWISE = -1;
+const CLOCKWISE = 1;
+
 const APPROACHING_SPEED = 60;
 const STOPPING_THRESHOLD = 5;
 const DEFAULT_CONFIG = {
   speed: 240,
   gameObjectStoppingDistance: STOPPING_THRESHOLD,
+  rotateOnMove: false,
+  rotateSpeed: 10,
   stoppingDistance: STOPPING_THRESHOLD,
 };
 
@@ -113,7 +120,7 @@ export class GameObjectEngine {
   slowOnApproachToWayPoint() {
     const currentWayPoint = this.getCurrentWayPoint();
     if (!currentWayPoint) {
-      return;
+      return this.stop();
     }
 
     this.updateVelocity(currentWayPoint, true);
@@ -123,6 +130,38 @@ export class GameObjectEngine {
     const { gameObject } = this;
     if (gameObject.body) {
       gameObject.body.reset(gameObject.x, gameObject.y)
+    }
+  }
+
+  /**
+   * @method updateAngle
+   * @param {Number} targetAngle
+   */
+  updateAngle(targetAngle) {
+    const { config, gameObject: actor } = this;
+    let delta;
+    targetAngle += NINETY_DEGREES_IN_RADIANS;
+
+    if (actor.rotation !== targetAngle) {
+      // Calculate difference between the current angle and targetAngle
+      delta = targetAngle - actor.rotation;
+
+      // Keep it in range from -180 to 180 to make the most efficient turns.
+      if (delta > Math.PI) {
+        delta -= THREE_SIXTY_DEGREES_IN_RADIANS;
+      }
+
+      if (delta < -Math.PI) {
+        delta += THREE_SIXTY_DEGREES_IN_RADIANS;
+      }
+
+      // Figure out what way to turn
+      actor.angle += config.rotateSpeed * (delta > 0 ? CLOCKWISE : ANTI_CLOCKWISE);
+
+      // Just set angle to target angle if they are close
+      if (Math.abs(delta) < Phaser.Math.DegToRad(config.rotateSpeed)) {
+        actor.rotation = targetAngle;
+      }
     }
   }
 
@@ -143,6 +182,11 @@ export class GameObjectEngine {
     newVelocity.add(cohesion);
 
     gameObject.body.velocity.copy(newVelocity).normalize().scale(config.speed);
+
+    if (config.rotateOnMove) {
+      const targetAngle = Phaser.Math.Angle.BetweenPoints(gameObject, currentWayPoint);
+      this.updateAngle(targetAngle);
+    }
   }
 
   update(time, delta) {
