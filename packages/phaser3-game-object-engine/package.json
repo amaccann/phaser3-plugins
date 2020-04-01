@@ -1,6 +1,6 @@
 {
   "name": "@pixelburp/phaser3-game-object-engine",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Phaser3 plugin to add \"engine\" automated motion",
   "homepage": "https://github.com/amaccann/phaser3-plugins#readme",
   "main": "dist/phaser3-game-object-engine-plugin.js",
