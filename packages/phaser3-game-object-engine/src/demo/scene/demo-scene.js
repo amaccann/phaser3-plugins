@@ -109,7 +109,7 @@ export default class DemoScene extends Scene {
     let sprite, y, worldX, worldY;
     this.mySprites = [];
     let x = 1;
-    const length = 1;
+    const length = 2;
     const OFFSET = 200;
 
     for (x; x <= length; x += 1) {
@@ -122,8 +122,6 @@ export default class DemoScene extends Scene {
         this.mySprites.push(sprite);
       }
     }
-
-    this.physics.world.enable(this.mySprites);
   }
 
   createAutoMovingSprite() {
