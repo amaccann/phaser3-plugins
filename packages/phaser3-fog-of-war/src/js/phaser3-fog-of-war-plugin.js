@@ -1,45 +1,59 @@
 import Phaser from 'phaser';
 
-import { forEach } from '@pixelburp/phaser3-utils';
-// import FogMap from './lib/fog-map';
+import { addDisplayListCallbacks, forEach } from '@pixelburp/phaser3-utils';
+import PluginConfig, { DEFAULT_MAP_CONFIG } from './lib/plugin-config';
+import FogTracker from './lib/fog-tracker';
+import FogCanvasTexture from './lib/fog-canvas-texture';
+import { getVisibleGameObjectSelector } from './lib/util';
 
 export default class Phaser3FogOfWarPlugin extends Phaser.Plugins.BasePlugin {
   scene;
+  tracker;
 
   setup(config = {}) {
+    const pluginConfig = {
+      ...DEFAULT_MAP_CONFIG,
+      ...config,
+    };
     const { scene } = config;
-    const { width, height } = scene.sys.game.canvas;
-    console.log(width, height);
+    PluginConfig.set(pluginConfig);
+
     this.scene = scene;
+    this.tracker = new FogTracker(scene);
+    this.canvas = new FogCanvasTexture(scene, this.tracker);
 
-    // this.fogMap = new FogMap(scene, {
-    //   width: 100,
-    //   height: 100,
-    // });
-
-    // this.shape = scene.make.graphics();
-    //
-    // this.mask = new Phaser.Display.Masks.GeometryMask(scene, this.shape);
-    // this.mask.setInvertAlpha(true);
-    //
-    // this.texture = scene.add.renderTexture(0, 0, width, height);
-    // this.texture.fill(0xff00ff, 0.5);
-    // this.texture.setScrollFactor(0);
-    // this.texture.setMask(this.mask);
+    addDisplayListCallbacks(this.scene, this.onDisplayListAdd, this.onDisplayListRemove);
   }
+
+  onDisplayListAdd = gameObject => {
+    console.log('onDisplayListAdd', gameObject);
+    this.tracker.onDisplayListAdd(gameObject);
+    this.canvas.onDisplayListAdd(gameObject);
+  };
+
+  onDisplayListRemove = gameObject => {
+    this.tracker.onDisplayListRemove(gameObject);
+    this.canvas.onDisplayListRemove(gameObject);
+  };
 
   start() {
     console.log('started');
   }
 
-  update() {
-    // this.shape.clear();
-    // this.shape.fillStyle(0xffffff);
-    //
+  /**
+   * @TODO Make sure the fog is removed when the plugin is stopped for any reason
+   */
+  stop() {
+    // this.tracker.unbindFromDisplayList();
+    console.log('stopped');
+  }
+
+  update(time, alpha) {
+    this.tracker.update(time, alpha);
+    this.canvas.update();
+
+    // Update visibility of Game Objects within the target scene
     const children = this.scene.children.getChildren();
-    forEach(children, gameObject => {
-      // this.shape.fillCircle(gameObject.x, gameObject.y, 75);
-      // this.fogMap.revealForGameObject(gameObject);
-    })
+    forEach(children, gameObject => getVisibleGameObjectSelector(gameObject, children));
   }
 }
