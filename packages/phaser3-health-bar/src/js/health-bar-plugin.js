@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { addDisplayListCallbacks } from '@pixelburp/phaser3-utils';
 
 import PluginConfig from './lib/plugin-config';
 import HealthBarScene, { SCENE_KEY } from './lib/health-bar-scene';
@@ -50,10 +51,7 @@ export default class HealthBarPlugin extends Phaser.Plugins.BasePlugin {
   }
 
   bindToDisplayList() {
-    const displayList = this.displayList;
-
-    displayList.addCallback = this.addHealthBarToChild;
-    displayList.removeCallback = this.removeHealthBarFromChild;
+    addDisplayListCallbacks(this.scene, this.addHealthBarToChild, this.removeHealthBarFromChild);
   }
 
   createScene() {
