@@ -9,6 +9,7 @@ const config = require('./config');
 module.exports = {
   mode: 'development',
   devtool: 'eval-source-map',
+  watch: true,
   entry: {
     entry: `${config.DEMO}/index.js`
   },

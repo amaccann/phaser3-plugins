@@ -1,4 +1,5 @@
-import { forEach } from '@pixelburp/phaser3-utils';
+import * as clipping from 'polygon-clipping';
+import { createPolygonFromSides, forEach, sortPointsClockwise } from '@pixelburp/phaser3-utils';
 
 import PluginConfig from './plugin-config';
 import { getCanClearFog, getViewDistanceByGameObject } from './util';
@@ -9,17 +10,15 @@ const distanceBetween = Phaser.Math.Distance.BetweenPoints;
 
 export default class FogTracker {
   debug;
-  shouldUpdate = false;
   scene;
   positions = [];
   cache = [];
+  polygons = [];
 
   constructor(scene) {
     this.debug = scene.add.graphics();
     this.debug.setDepth(IMAGE_DEPTH + 1);
-    // this.debug.fillRect(0, 0, 1000, 1000);
     this.scene = scene;
-    // this.bindToDisplayList();
   }
 
   get allChildren() {
@@ -35,17 +34,21 @@ export default class FogTracker {
   }
 
   addToPositions(gameObject, viewDistance) {
-    // const polygon = createPolygonFromSides(gameObject.x, gameObject.y, 8, FIELD_OF_VIEW);
-    // const sortedPolygon = sortPointsClockwise(polygon);
-    // console.log('polygon,', polygon);
-    // console.log('sortedPolygon,', sortedPolygon);
+    const polygon = createPolygonFromSides(gameObject.x, gameObject.y, 8, viewDistance);
+    const sortedPolygon = new Phaser.Geom.Polygon(sortPointsClockwise(polygon));
+    const flattened = sortedPolygon.points.map(p => [p.x, p.y]);
+
+    if (!this.polygons.length) {
+      this.polygons = [flattened];
+    } else {
+      this.polygons = clipping.union([flattened], this.polygons);
+    }
 
     this.positions.push(new FogTrackerPosition(gameObject, viewDistance));
-    this.shouldUpdate = true;
+    // this.updateDebug();
   }
 
   onDisplayListAdd = gameObject => {
-    // this.scene.children.bringToTop(this.debug);
     const canClearFog = getCanClearFog(gameObject);
     if (canClearFog) {
       const viewDistance = getViewDistanceByGameObject(gameObject);
@@ -59,11 +62,17 @@ export default class FogTracker {
     const { debug, positions } = this;
     debug.clear();
 
-    debug.fillStyle(0x000000, 0);
-    debug.lineStyle(2, DEBUG_SELECTION_COLOR, 0.5);
+    debug.lineStyle(2, 0xff0000);
+    debug.fillStyle(0xff0000, 0.4);
 
-    forEach(positions, position => {
-      debug.strokeCircle(position.x, position.y, position.viewDistance);
+    forEach(this.polygons, group => {
+      forEach(group, polygon => {
+        debug.strokePoints(
+          polygon.map(p => ({ x: p[0], y: p[1] })),
+          true
+        );
+        debug.fillPoints(polygon.map(p => ({ x: p[0], y: p[1] })));
+      });
     });
   }
 
@@ -85,15 +94,6 @@ export default class FogTracker {
   }
 
   update() {
-    const { positions, shouldUpdate } = this;
-
     this.updatePositions();
-
-    if (!shouldUpdate) {
-      return;
-    }
-
-    this.shouldUpdate = false;
-    // this.updateDebug();
   }
 }

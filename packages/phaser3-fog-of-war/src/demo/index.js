@@ -6,7 +6,7 @@ import DemoScene from './scene/demo-scene';
 import FogOfWarPlugin from '../js/phaser3-fog-of-war-plugin';
 
 const config = {
-  type: Phaser.AUTO,
+  type: Phaser.WEBGL,
   width: 1600,
   height: 1000,
   parent: 'mycanvas',

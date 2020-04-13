@@ -148,7 +148,7 @@ export default class DemoScene extends Phaser.Scene {
     this.fogOfWarPlugin.setup({
       canClearFogSelector: this.canClearFogSelector,
       fogBgColor: '#333',
-      fogBgOpacity: 0.8,
+      fogBgOpacity: 0.5,
       scene: this,
       viewDistanceProp: 'viewDistance',
       visibleGameObjectSelector: this.visibleGameObjectSelector,

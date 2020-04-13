@@ -30,6 +30,9 @@ export default class FogCanvasTexture {
     this.drawBackground(true);
   }
 
+  /**
+   * @return CanvasRenderingContext2D
+   */
   get context() {
     return this.canvas.context;
   }
@@ -48,11 +51,14 @@ export default class FogCanvasTexture {
     return camera.scrollX || camera.scrollY;
   }
 
-  getWorldPoint(object) {
+  getWorldPoint(target) {
     const { scene } = this;
     const camera = scene.cameras.main;
-    const x = (object.x - camera.worldView.x) * camera.zoom;
-    const y = (object.y - camera.worldView.y) * camera.zoom;
+    const originX = Array.isArray(target) ? target[0] : target.x;
+    const originY = Array.isArray(target) ? target[1] : target.y;
+
+    const x = (originX - camera.worldView.x) * camera.zoom;
+    const y = (originY - camera.worldView.y) * camera.zoom;
 
     return { x, y };
   }
@@ -99,6 +105,8 @@ export default class FogCanvasTexture {
 
   onDisplayListAdd = gameObject => {
     const canClearFog = getCanClearFog(gameObject);
+    this.clearAll(true); // First clear and redraw the fog filled
+    this.drawBackground(true); // Draw the fixed background
     this.drawValidGameObjects(true);
   };
 
@@ -128,27 +136,33 @@ export default class FogCanvasTexture {
     }
   }
 
-  drawVisitedPositions(refresh = false) {
+  drawVisitedPolygons(refresh = false) {
     const { canvas, tracker } = this;
     const ctx = this.context;
-    const FIELD_OF_VIEW = 100; // @TODO - Tether as configurable
 
     ctx.globalCompositeOperation = 'destination-out';
-    // For each tracked position
-    forEach(tracker.positions, position => {
-      ctx.globalCompositeOperation = 'destination-out';
-      const rgr = ctx.createRadialGradient(position.x, position.y, 80, position.x, position.y, FIELD_OF_VIEW);
-      rgr.addColorStop(0, 'rgba(0, 0, 0, 1)');
-      rgr.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = 'rgba(0, 0, 0, .5)';
+    ctx.strokeStyle = 'rgba(0, 0, 0, .5)';
+    ctx.lineWidth = 5;
 
-      ctx.beginPath();
-      ctx.fillStyle = this.getGradientByGameObject(position, position.viewDistance);
-      ctx.arc(position.x, position.y, position.viewDistance, 0, 2 * Math.PI);
-      ctx.fill();
+    forEach(tracker.polygons, polyGroup => {
+      forEach(polyGroup, polygon => {
+        const [moveTo, ...restOfPoly] = polygon;
+        const start = this.getWorldPoint(moveTo);
+
+        ctx.beginPath();
+        ctx.moveTo(start.x, start.y);
+        forEach(restOfPoly, point => {
+          const coord = this.getWorldPoint(point);
+          ctx.lineTo(coord.x, coord.y);
+        });
+        ctx.fill();
+        ctx.closePath();
+        ctx.stroke();
+      });
     });
-
-    // Reset composite operations back to default
     ctx.globalCompositeOperation = 'source-over';
+
     if (refresh) {
       canvas.refresh();
     }
@@ -199,7 +213,7 @@ export default class FogCanvasTexture {
 
     this.clearAll(); // First clear and redraw the fog filled
     this.drawBackground(); // Draw the fixed background
-    // this.drawVisitedPositions(); // Draw the "visited" areas in lighter shade
+    // this.drawVisitedPolygons();
     this.drawValidGameObjects(); // Draw each valid game-object that should see through the fog
 
     canvas.refresh();

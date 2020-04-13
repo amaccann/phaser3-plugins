@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 const TEMP_SPEED = 250;
 
 export default class DemoSprite extends Phaser.GameObjects.Sprite {
-  viewDistance = 200;
+  viewDistance = 80;
 
   constructor(scene, x, y) {
     super(scene, x, y, 'enabled-sprite');
