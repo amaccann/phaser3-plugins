@@ -1,4 +1,6 @@
 import Phaser from 'phaser';
+import { DragSelectPlugin } from '@pixelburp/phaser3-drag-select';
+import { GameObjectEnginePlugin } from '@pixelburp/phaser3-game-object-engine';
 
 import DemoScene from './scene/demo-scene';
 import FormationGeneratorPlugin from '../js/formation-generator-plugin';
@@ -9,7 +11,11 @@ const config = {
   height: 1000,
   parent: 'mycanvas',
   plugins: {
-    global: [{ key: 'FormationGeneratorPlugin', plugin: FormationGeneratorPlugin }],
+    global: [
+      { key: 'DragSelectPlugin', plugin: DragSelectPlugin },
+      { key: 'GameObjectEnginePlugin', plugin: GameObjectEnginePlugin },
+      { key: 'FormationGeneratorPlugin', plugin: FormationGeneratorPlugin },
+    ],
   },
   physics: {
     default: 'arcade',
@@ -22,4 +28,3 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
-

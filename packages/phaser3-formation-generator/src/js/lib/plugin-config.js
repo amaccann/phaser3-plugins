@@ -8,11 +8,17 @@ class PluginConfig {
    */
   camera = null;
 
+  collisionIndices = [];
+
   gridSize = 1;
 
   mouseClickToTrack = MOUSE_BUTTONS.RIGHT;
 
+  onComplete = () => true;
+
   scene = null;
+
+  tileLayer = null;
 
   setConfig(props = {}) {
     Object.keys(props).forEach(key => {

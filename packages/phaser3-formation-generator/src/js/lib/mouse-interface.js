@@ -6,7 +6,7 @@ import Tile from './tile';
 const PREVENT_DEFAULT = e => e.preventDefault();
 const DEFAULT_GRID_CONFIG = {
   maxCols: 0,
-  minCols: 0
+  minCols: 0,
 };
 const NINETY_DEGREES_AS_RADIANS = Math.PI / 2;
 const TEST_RADIUS = 16;
@@ -20,28 +20,27 @@ const FLOOD_DIRECTIONS = {
   // SOUTH_WEST: [-1, 1],
   // SOUTH_EAST: [1, 1],
   WEST: [-1, 0],
-  EAST: [1, 0]
+  EAST: [1, 0],
 };
 
 function flood_fill(pos_x, pos_y, target_color, color) {
-
   // if there is no wall or if i haven't been there, already go back
-  if(a[pos_x][pos_y] == wall || a[pos_x][pos_y] == color) {
+  if (a[pos_x][pos_y] == wall || a[pos_x][pos_y] == color) {
     return;
   }
 
-  if(a[pos_x][pos_y] != target_color) // if it's not color go back
+  if (a[pos_x][pos_y] != target_color)
+    // if it's not color go back
     return;
 
   a[pos_x][pos_y] = color; // mark the point so that I know if I passed through it.
 
-  flood_fill(pos_x + 1, pos_y, color);  // then i can either go south
-  flood_fill(pos_x - 1, pos_y, color);  // or north
-  flood_fill(pos_x, pos_y + 1, color);  // or east
-  flood_fill(pos_x, pos_y - 1, color);  // or west
+  flood_fill(pos_x + 1, pos_y, color); // then i can either go south
+  flood_fill(pos_x - 1, pos_y, color); // or north
+  flood_fill(pos_x, pos_y + 1, color); // or east
+  flood_fill(pos_x, pos_y - 1, color); // or west
 
   return;
-
 }
 
 export default class MouseInterface extends Phaser.GameObjects.Graphics {
@@ -99,9 +98,11 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
   }
 
   enableAllEvents() {
+    const { scene } = this;
     const mouseClickToTrack = PluginConfig.get('mouseClickToTrack');
     this.enableRightClick(mouseClickToTrack === MOUSE_BUTTONS.RIGHT);
     this.scene.input.on('gameout', this.onGameOut);
+    scene.input.on('pointerdown', this.onPointerUp);
   }
 
   enableRightClick(enable = true) {
@@ -185,7 +186,7 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
    */
   generateFormations() {
     const { end, gridConfig, previews, start, targetChildren } = this;
-    const {  maxCols, minCols } = gridConfig;
+    const { maxCols, minCols } = gridConfig;
     const gridSize = PluginConfig.get('gridSize');
     const centroid = Phaser.Geom.Point.GetCentroid(targetChildren);
     const sorted = sortClockwise(targetChildren, centroid);
@@ -208,12 +209,11 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
       console.log('distance', distance);
     });
 
-
     return;
 
     // flood fill from midpoint...
 
-/*
+    /*
     const floodFill = (x, y, currentChildren = []) => {
       console.group(`children left: ${currentChildren.length}`);
       console.log('x', x, 'y', y);
@@ -272,7 +272,7 @@ export default class MouseInterface extends Phaser.GameObjects.Graphics {
     this.fillCircle(end.centerX, end.centerY, TEST_RADIUS);
     this.strokeCircle(end.centerX, end.centerY, TEST_RADIUS);
 
-    previews.forEach((preview) => {
+    previews.forEach(preview => {
       this.fillStyle(TEST_COLOR, 1);
       this.fillRect(preview.x, preview.y, gridSize, gridSize);
     });
