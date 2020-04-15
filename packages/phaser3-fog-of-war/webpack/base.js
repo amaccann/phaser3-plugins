@@ -9,9 +9,8 @@ const config = require('./config');
 module.exports = {
   mode: 'development',
   devtool: 'eval-source-map',
-  watch: true,
   entry: {
-    entry: `${config.DEMO}/index.js`
+    entry: `${config.DEMO}/index.js`,
   },
   resolve: {
     alias: {
@@ -26,7 +25,7 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: config.BABEL,
-        }
+        },
       },
       {
         test: [/\.vert$/, /\.frag$/],
