@@ -1,6 +1,6 @@
 {
   "name": "@pixelburp/phaser3-fog-of-war",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Phaser 3 plugin to render a \"Fog of War\" effect",
   "main": "dist/phaser3-drag-select-plugin.js",
   "repository": {
