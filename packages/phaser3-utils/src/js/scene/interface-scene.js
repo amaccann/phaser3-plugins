@@ -1,4 +1,4 @@
-import { forEach } from '@pixelburp/phaser3-utils';
+import forEach from '../util/forEach';
 
 export const INTERFACE_SCENE_KEY = 'PxlBrp:Phaser3Plugins:InterfaceScene';
 
