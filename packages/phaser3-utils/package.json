@@ -3,7 +3,7 @@
   "sideEffects": false,
   "version": "0.0.11",
   "description": "Useful tools and functions for plugins",
-  "main": "src/index.exports.js",
+  "main": "dist/phaser3-utils.js",
   "repository": {
     "type": "git",
     "url": "git@github.com:amaccann/phaser3-plugins.git"
