@@ -6,6 +6,8 @@ import PathLine from './path-line';
 const { KeyCodes } = Phaser.Input.Keyboard;
 
 export default class DemoScene extends Phaser.Scene {
+  closestPolyByClick;
+  closestPolyByClickGfx;
   fpsText;
   mySprite;
   moveTo = null;
@@ -64,9 +66,14 @@ export default class DemoScene extends Phaser.Scene {
   };
 
   onPointerUp = pointer => {
-    if (this.isLeftDown) {
+    const isShift = pointer?.event?.shiftKey;
+    console.log('isShift', isShift);
+
+    if (this.isLeftDown && isShift) {
       this.placeTileAt(pointer);
       this.updateNavMesh();
+    } else if (this.isLeftDown) {
+      this.calculateClosestNavMeshPoly(pointer);
     } else {
       this.moveSpriteTo(pointer);
     }
@@ -76,7 +83,24 @@ export default class DemoScene extends Phaser.Scene {
   placeTileAt(pointer) {
     const worldPoint = pointer.positionToCamera(this.cameras.main);
 
-    this.tileMap.placeTileAtWorldPoint(worldPoint)
+    this.tileMap.placeTileAtWorldPoint(worldPoint);
+  }
+
+  calculateClosestNavMeshPoly(pointer) {
+    console.log('check poly');
+    const worldPoint = pointer.positionToCamera(this.cameras.main);
+    this.closestPolyByClick = this.navMeshPlugin.getClosestPolygon(undefined, true);
+    console.log('closestPolyByClick', this.closestPolyByClick);
+
+    this.closestPolyByClickGfx.clear();
+
+    this.closestPolyByClickGfx.fillStyle(0xffff00);
+    this.closestPolyByClickGfx.fillCircle(worldPoint.x, worldPoint.y, 10);
+
+    this.closestPolyByClickGfx.fillStyle(0x0000ff, 0.6);
+    if (this.closestPolyByClick) {
+      this.closestPolyByClickGfx.fillPoints(this.closestPolyByClick.points);
+    }
   }
 
   moveSpriteTo(pointer) {
@@ -96,9 +120,9 @@ export default class DemoScene extends Phaser.Scene {
       debug: {
         hulls: false,
         navMesh: true,
-        navMeshNodes: false,
+        navMeshNodes: true,
         polygonBounds: false,
-        aStarPath: false
+        aStarPath: false,
       },
       midPointThreshold: 0,
       offsetHullsBy: 250,
@@ -144,6 +168,8 @@ export default class DemoScene extends Phaser.Scene {
     this.createCamera();
     this.createGameObjects();
     this.updateNavMesh();
+    this.closestPolyByClickGfx = this.add.graphics();
+    this.closestPolyByClickGfx.setDepth(9999);
   }
 
   update(time, delta) {

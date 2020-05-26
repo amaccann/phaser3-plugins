@@ -9,6 +9,10 @@ function err() {
 }
 
 export default class NavMeshPlugin extends Phaser.Plugins.BasePlugin {
+  /**
+   * @name navMesh
+   * @type NavMesh
+   */
   navMesh;
   spritesCache = new SpritesCache();
 
@@ -33,6 +37,30 @@ export default class NavMeshPlugin extends Phaser.Plugins.BasePlugin {
     return this.navMesh;
   }
 
+  /**
+   * @method getClosestPolygon
+   * @description Finds the closest NavMesh polygon, based on world point
+   * @param position The world point
+   * @param position.x {Number}
+   * @param position.y {Number}
+   * @param includeOutOfBounds {Boolean} whether to include "out of bounds" searches
+   */
+  getClosestPolygon(position, includeOutOfBounds = false) {
+    if (!this.navMesh) {
+      return false;
+    } else if (!position || !position.x || !position.y) {
+      return false;
+    }
+
+    const poly = this.navMesh.getPolygonByXY(position.x, position.y);
+    if (!includeOutOfBounds) {
+      return poly || false;
+    }
+
+    // If no poly (ie, out of bounds), try finding the closest polygon in the whole nav-mesh
+    return poly || this.navMesh.findClosestPolygonToPoint(position) || false;
+  }
+
   getPath(startPosition, endPosition, offset) {
     if (!this.navMesh) {
       return false;
@@ -49,9 +77,7 @@ export default class NavMeshPlugin extends Phaser.Plugins.BasePlugin {
   getAllTilesWithin(worldX, worldY, spriteWidth, spriteHeight) {
     const tileLayer = Config.get('tileLayer');
     const tileAtXY = tileLayer.getTileAtWorldXY(worldX, worldY, true);
-    console.log('tileAtXY', tileAtXY);
     if (!tileAtXY) {
-      console.groupEnd();
       return [];
     }
 
@@ -83,7 +109,7 @@ export default class NavMeshPlugin extends Phaser.Plugins.BasePlugin {
     }
 
     const tilesWithin = this.getAllTilesWithin(worldX, worldY, spriteWidth, spriteHeight);
-    forEach(tilesWithin, (tile) => {
+    forEach(tilesWithin, tile => {
       const isAlreadyCached = this.spritesCache.has(tile);
       if (isAlreadyCached) {
         return;
@@ -99,7 +125,7 @@ export default class NavMeshPlugin extends Phaser.Plugins.BasePlugin {
       tile.setCollision(true, true, true, true, true);
     });
 
-    if(tilesWithin.length) {
+    if (tilesWithin.length) {
       this.navMesh.generate();
     }
   }
@@ -116,7 +142,7 @@ export default class NavMeshPlugin extends Phaser.Plugins.BasePlugin {
     }
 
     const tilesWithin = this.getAllTilesWithin(worldX, worldY, spriteWidth, spriteHeight);
-    forEach(tilesWithin, (tile) => {
+    forEach(tilesWithin, tile => {
       const cachedTileIndex = this.spritesCache.get(tile);
       if (cachedTileIndex) {
         tileLayer.putTileAt(cachedTileIndex, tile.x, tile.y);
@@ -130,7 +156,7 @@ export default class NavMeshPlugin extends Phaser.Plugins.BasePlugin {
   }
 
   start() {
-    console.log('start')
+    console.log('start');
   }
 
   stop() {

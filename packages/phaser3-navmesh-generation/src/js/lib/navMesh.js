@@ -69,4 +69,38 @@ export default class NavMesh {
     return this.delaunay.polygons.find(polygon => polygon.contains(x, y));
   }
 
+  /**
+   * @method findClosestPolygonToPoint
+   * @description Finds the closest NavMesh polygon to the given world point
+   * @param point
+   * @param point.x {Number}
+   * @param point.y {Number}
+   */
+  findClosestPolygonToPoint(point) {
+    const { polygons } = this.delaunay;
+    let length = polygons.length;
+    let poly;
+    let distanceToLine;
+    let distance = Number.MAX_SAFE_INTEGER;
+    let closest;
+    let i = 0;
+    let edgesLength;
+    let j;
+
+    for (i; i < length; i += 1) {
+      poly = polygons[i];
+      j = 0;
+      edgesLength = poly.edges.length;
+
+      for (j; j < edgesLength; j += 1) {
+        distanceToLine = poly.edges[j].distanceToPoint(point);
+        if (distanceToLine < distance) {
+          distance = distanceToLine;
+          closest = poly;
+        }
+      }
+    }
+
+    return closest;
+  }
 }
